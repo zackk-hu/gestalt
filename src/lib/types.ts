@@ -118,7 +118,7 @@ export interface CompileResponse {
 
 // 默认配置 - ModelScope 魔搭社区
 export const DEFAULT_CONFIG: ApiConfig = {
-  apiKey: '',  // 优先使用环境变量 MODELSCOPE_API_KEY
+  apiKey: 'ms-74196180-fca4-49f0-893c-53c75dd54e2b',
   baseUrl: 'https://api-inference.modelscope.cn/v1',
   modelName: 'Qwen/Qwen2.5-72B-Instruct'
 }
