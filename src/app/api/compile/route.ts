@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCompilerSystemPrompt } from '@/lib/prompts'
-import { Message } from '@/lib/types'
+import { Message, PromptType } from '@/lib/types'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
 
   try {
     const body = await request.json()
-    const { messages, config } = body as { messages: Message[], config: { apiKey: string, baseUrl: string, modelName: string } }
+    const { messages, config, taskType = PromptType.TEXT } = body as { 
+      messages: Message[]
+      config: { apiKey: string, baseUrl: string, modelName: string }
+      taskType?: PromptType
+    }
 
     // 优先使用服务器端环境变量的 API Key
     const apiKey = process.env.MODELSCOPE_API_KEY || config?.apiKey
@@ -27,8 +31,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 获取系统提示词
-    const systemPrompt = getCompilerSystemPrompt()
+    // 获取最后一条用户消息作为输入
+    const lastUserMessage = messages.filter(m => m.role === 'user').pop()
+    const userInput = lastUserMessage?.content || ''
+
+    // 根据任务类型获取对应的系统提示词
+    const systemPrompt = getCompilerSystemPrompt(taskType, userInput)
 
     const baseUrl = process.env.MODELSCOPE_BASE_URL || config.baseUrl || 'https://api-inference.modelscope.cn/v1'
     const modelName = config.modelName || 'Qwen/Qwen2.5-72B-Instruct'

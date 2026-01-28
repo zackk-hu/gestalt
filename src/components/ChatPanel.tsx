@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Trash2, User, Bot, Loader2, Pencil, Check, X, Zap, Brain, GitBranch } from 'lucide-react'
+import { Send, Trash2, User, Bot, Loader2, Pencil, Check, X, Zap, Brain, GitBranch, FileText, Image as ImageIcon, Video } from 'lucide-react'
 import { Button } from './Button'
-import { Message, ApiConfig, generateId } from '@/lib/types'
+import { Message, ApiConfig, generateId, PromptType, TASK_TYPE_OPTIONS } from '@/lib/types'
 import { extractPromptFromResponse, extractReasoningMode, EXAMPLE_QUESTIONS } from '@/lib/prompts'
 import { cn } from '@/lib/utils'
 
@@ -47,6 +47,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
   const [editingContent, setEditingContent] = useState('')
   const [lastReasoningMode, setLastReasoningMode] = useState<{ complexity: string; mode: string } | null>(null)
+  const [taskType, setTaskType] = useState<PromptType>(PromptType.TEXT)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const editInputRef = useRef<HTMLTextAreaElement>(null)
@@ -79,6 +80,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         body: JSON.stringify({
           messages: [...messagesToSend, newUserMessage],
           config,
+          taskType,  // 传递任务类型
         }),
       })
 
@@ -237,34 +239,102 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         </Button>
       </div>
 
+      {/* 任务类型选择器 */}
+      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500 dark:text-slate-400">任务类型：</span>
+          <div className="flex gap-1">
+            {TASK_TYPE_OPTIONS.map((option) => (
+              <button
+                key={option.type}
+                onClick={() => setTaskType(option.type)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                  taskType === option.type
+                    ? 'bg-primary-500 text-white shadow-sm'
+                    : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600'
+                )}
+                title={option.description}
+              >
+                <span>{option.icon}</span>
+                <span>{option.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* 消息列表 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-slate-400 dark:text-slate-500 mb-4">
               <Bot className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>开始对话，描述你想要的提示词</p>
-              <p className="text-sm mt-1">系统会自动判断任务复杂度，智能切换推理模式</p>
+              <p>开始对话，描述你想要的{taskType === PromptType.TEXT ? '提示词' : taskType === PromptType.IMAGE ? '图片效果' : '视频效果'}</p>
+              <p className="text-sm mt-1">
+                {taskType === PromptType.TEXT 
+                  ? '系统会自动判断任务复杂度，智能切换推理模式'
+                  : taskType === PromptType.IMAGE
+                  ? '系统会用"导演视角"结构化你的创意'
+                  : '系统会生成专业的分镜脚本和运镜指令'}
+              </p>
             </div>
             
-            {/* 推理模式说明 */}
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
-              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs">
-                <Zap className="w-3 h-3" />
-                直觉式 · 简单任务
+            {/* 推理模式说明 (仅文本模式显示) */}
+            {taskType === PromptType.TEXT && (
+              <div className="flex flex-wrap justify-center gap-2 mb-4">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs">
+                  <Zap className="w-3 h-3" />
+                  直觉式 · 简单任务
+                </div>
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs">
+                  <Brain className="w-3 h-3" />
+                  思维链 · 中等任务
+                </div>
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs">
+                  <GitBranch className="w-3 h-3" />
+                  思维树 · 复杂任务
+                </div>
               </div>
-              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs">
-                <Brain className="w-3 h-3" />
-                思维链 · 中等任务
+            )}
+
+            {/* 图片/视频模式说明 */}
+            {taskType === PromptType.IMAGE && (
+              <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
+                <span className="px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                  Subject 主体
+                </span>
+                <span className="px-2 py-1 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300">
+                  Environment 环境
+                </span>
+                <span className="px-2 py-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300">
+                  Photography 摄影
+                </span>
+                <span className="px-2 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
+                  Style 风格
+                </span>
               </div>
-              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs">
-                <GitBranch className="w-3 h-3" />
-                思维树 · 复杂任务
+            )}
+
+            {taskType === PromptType.VIDEO && (
+              <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
+                <span className="px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                  Scene 场面调度
+                </span>
+                <span className="px-2 py-1 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300">
+                  Camera 运镜
+                </span>
+                <span className="px-2 py-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300">
+                  Motion 运动
+                </span>
+                <span className="px-2 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
+                  Atmosphere 氛围
+                </span>
               </div>
-            </div>
+            )}
 
             <div className="flex flex-wrap justify-center gap-2 mt-4">
-              {EXAMPLE_QUESTIONS.slice(0, 4).map((example, index) => (
+              {EXAMPLE_QUESTIONS[taskType].slice(0, 4).map((example, index) => (
                 <button
                   key={index}
                   onClick={() => handleExampleClick(example)}
@@ -398,7 +468,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
           </Button>
         </div>
         <p className="text-xs text-slate-400 mt-2">
-          悬停消息可编辑 · 系统自动切换 直觉式/思维链/思维树 推理模式
+          悬停消息可编辑 · 当前模式：{TASK_TYPE_OPTIONS.find(o => o.type === taskType)?.name}
         </p>
       </div>
     </div>
