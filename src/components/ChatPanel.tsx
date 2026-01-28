@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Trash2, User, Bot, Loader2, Pencil, Check, X, Zap, Brain, GitBranch, FileText, Image as ImageIcon, Video } from 'lucide-react'
+import { Send, Trash2, User, Bot, Loader2, Pencil, Check, X, Zap, Brain, GitBranch, FileText, Image as ImageIcon, Video, Paperclip, File, XCircle } from 'lucide-react'
 import { Button } from './Button'
 import { Message, ApiConfig, generateId, PromptType, TASK_TYPE_OPTIONS } from '@/lib/types'
 import { extractPromptFromResponse, extractReasoningMode, EXAMPLE_QUESTIONS } from '@/lib/prompts'
@@ -10,6 +10,16 @@ import { cn } from '@/lib/utils'
 interface ChatPanelProps {
   config: ApiConfig
   onPromptExtracted: (prompt: string) => void
+}
+
+// 文件附件接口
+interface FileAttachment {
+  id: string
+  file: File
+  name: string
+  type: string // 'image' | 'document' | 'other'
+  preview?: string // 图片预览URL
+  size: number
 }
 
 // 推理模式标签组件
@@ -41,16 +51,37 @@ function ReasoningModeTag({ mode, complexity }: { mode: string; complexity: stri
 }
 
 export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
-  const [messages, setMessages] = useState<Message[]>([])
+  // 按任务类型分开存储消息历史
+  const [messagesByType, setMessagesByType] = useState<Record<PromptType, Message[]>>({
+    [PromptType.TEXT]: [],
+    [PromptType.IMAGE]: [],
+    [PromptType.VIDEO]: [],
+  })
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
   const [editingContent, setEditingContent] = useState('')
   const [lastReasoningMode, setLastReasoningMode] = useState<{ complexity: string; mode: string } | null>(null)
   const [taskType, setTaskType] = useState<PromptType>(PromptType.TEXT)
+  const [attachments, setAttachments] = useState<FileAttachment[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const editInputRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 当前任务类型的消息
+  const messages = messagesByType[taskType]
+
+  // 更新当前任务类型的消息
+  const setMessages = (updater: Message[] | ((prev: Message[]) => Message[])) => {
+    setMessagesByType(prev => ({
+      ...prev,
+      [taskType]: typeof updater === 'function' ? updater(prev[taskType]) : updater
+    }))
+  }
+
+  // 文件数量限制
+  const MAX_FILES = 10
 
   // 自动滚动到底部
   const scrollToBottom = () => {
@@ -68,6 +99,77 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
       editInputRef.current.setSelectionRange(editingContent.length, editingContent.length)
     }
   }, [editingMessageId])
+
+  // 清理图片预览URL (组件卸载时)
+  useEffect(() => {
+    return () => {
+      attachments.forEach(att => {
+        if (att.preview) URL.revokeObjectURL(att.preview)
+      })
+    }
+  }, [])
+
+  // 获取文件类型分类
+  const getFileType = (file: File): 'image' | 'document' | 'other' => {
+    if (file.type.startsWith('image/')) return 'image'
+    if (file.type.includes('pdf') || file.type.includes('document') || 
+        file.type.includes('text') || file.name.endsWith('.txt') ||
+        file.name.endsWith('.md') || file.name.endsWith('.json') ||
+        file.name.endsWith('.csv') || file.name.endsWith('.xml')) return 'document'
+    return 'other'
+  }
+
+  // 格式化文件大小
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
+  // 处理文件选择
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    const remainingSlots = MAX_FILES - attachments.length
+    const filesToAdd = Array.from(files).slice(0, remainingSlots)
+
+    const newAttachments: FileAttachment[] = filesToAdd.map(file => {
+      const fileType = getFileType(file)
+      const attachment: FileAttachment = {
+        id: generateId(),
+        file,
+        name: file.name,
+        type: fileType,
+        size: file.size,
+      }
+      // 为图片生成预览
+      if (fileType === 'image') {
+        attachment.preview = URL.createObjectURL(file)
+      }
+      return attachment
+    })
+
+    setAttachments(prev => [...prev, ...newAttachments])
+    // 重置input以允许重复选择同一文件
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  // 移除附件
+  const removeAttachment = (id: string) => {
+    setAttachments(prev => {
+      const attachment = prev.find(a => a.id === id)
+      if (attachment?.preview) {
+        URL.revokeObjectURL(attachment.preview)
+      }
+      return prev.filter(a => a.id !== id)
+    })
+  }
+
+  // 触发文件选择
+  const triggerFileSelect = () => {
+    fileInputRef.current?.click()
+  }
 
   // 发送消息的核心逻辑
   const sendMessage = async (messagesToSend: Message[], newUserMessage: Message) => {
@@ -130,17 +232,33 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
 
   // 发送新消息
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return
+    if ((!input.trim() && attachments.length === 0) || isLoading) return
+
+    // 构建包含附件信息的消息内容
+    let messageContent = input.trim()
+    if (attachments.length > 0) {
+      const attachmentInfo = attachments.map(att => 
+        `[附件: ${att.name} (${att.type === 'image' ? '图片' : att.type === 'document' ? '文档' : '文件'}, ${formatFileSize(att.size)})]`
+      ).join('\n')
+      messageContent = messageContent 
+        ? `${messageContent}\n\n---\n${attachmentInfo}`
+        : attachmentInfo
+    }
 
     const userMessage: Message = {
       id: generateId(),
       role: 'user',
-      content: input.trim(),
+      content: messageContent,
       timestamp: Date.now()
     }
 
     setMessages(prev => [...prev, userMessage])
     setInput('')
+    // 清空附件并释放预览URL
+    attachments.forEach(att => {
+      if (att.preview) URL.revokeObjectURL(att.preview)
+    })
+    setAttachments([])
     
     await sendMessage(messages, userMessage)
   }
@@ -201,6 +319,11 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     setEditingMessageId(null)
     setEditingContent('')
     setLastReasoningMode(null)
+    // 清空附件并释放预览URL
+    attachments.forEach(att => {
+      if (att.preview) URL.revokeObjectURL(att.preview)
+    })
+    setAttachments([])
     onPromptExtracted('')
   }
 
@@ -452,7 +575,77 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
 
       {/* 输入区域 */}
       <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+        {/* 附件预览列表 */}
+        {attachments.length > 0 && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {attachments.map(att => (
+              <div 
+                key={att.id}
+                className="relative group flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+              >
+                {att.type === 'image' && att.preview ? (
+                  <img 
+                    src={att.preview} 
+                    alt={att.name}
+                    className="w-10 h-10 object-cover rounded"
+                  />
+                ) : (
+                  <div className="w-10 h-10 flex items-center justify-center bg-slate-200 dark:bg-slate-700 rounded">
+                    {att.type === 'image' ? (
+                      <ImageIcon className="w-5 h-5 text-slate-500" />
+                    ) : att.type === 'document' ? (
+                      <FileText className="w-5 h-5 text-slate-500" />
+                    ) : (
+                      <File className="w-5 h-5 text-slate-500" />
+                    )}
+                  </div>
+                )}
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate max-w-[120px]">
+                    {att.name}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {formatFileSize(att.size)}
+                  </span>
+                </div>
+                <button
+                  onClick={() => removeAttachment(att.id)}
+                  className="absolute -top-1.5 -right-1.5 p-0.5 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="移除附件"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+            {attachments.length >= MAX_FILES && (
+              <div className="flex items-center px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
+                已达到最大文件数量 ({MAX_FILES})
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 隐藏的文件输入 */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*,.pdf,.txt,.md,.json,.csv,.xml,.doc,.docx"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
         <div className="flex gap-2">
+          {/* 上传按钮 */}
+          <Button
+            variant="ghost"
+            onClick={triggerFileSelect}
+            disabled={isLoading || attachments.length >= MAX_FILES}
+            className="self-end"
+            title={`上传文件 (${attachments.length}/${MAX_FILES})`}
+          >
+            <Paperclip className="w-4 h-4" />
+          </Button>
           <textarea
             ref={inputRef}
             value={input}
@@ -466,14 +659,14 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
           <Button
             variant="primary"
             onClick={handleSend}
-            disabled={!input.trim() || isLoading}
+            disabled={(!input.trim() && attachments.length === 0) || isLoading}
             className="self-end"
           >
             <Send className="w-4 h-4" />
           </Button>
         </div>
         <p className="text-xs text-slate-400 mt-2">
-          悬停消息可编辑 · 当前模式：{TASK_TYPE_OPTIONS.find(o => o.type === taskType)?.name}
+          悬停消息可编辑 · 支持上传图片/文档 (最多{MAX_FILES}个) · 当前模式：{TASK_TYPE_OPTIONS.find(o => o.type === taskType)?.name}
         </p>
       </div>
     </div>

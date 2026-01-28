@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Copy, Check, ChevronDown, ChevronUp, Cpu, Loader2, Sparkles, Trash2, User, Bot, Play } from 'lucide-react'
+import { Send, Copy, Check, ChevronDown, ChevronUp, Cpu, Loader2, Sparkles, Trash2, User, Bot, Play, Maximize2, Minimize2 } from 'lucide-react'
 import { Button } from './Button'
 import { ApiConfig, AVAILABLE_MODELS, ModelOption, Message, generateId } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -17,6 +17,8 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
   const [isModelOpen, setIsModelOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [isPromptCollapsed, setIsPromptCollapsed] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isPromptExpanded, setIsPromptExpanded] = useState(false)
   
   // 对话相关状态
   const [chatMessages, setChatMessages] = useState<Message[]>([])
@@ -26,6 +28,18 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  // 处理 ESC 键退出全屏
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isPromptExpanded) setIsPromptExpanded(false)
+        else if (isExpanded) setIsExpanded(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isExpanded, isPromptExpanded])
 
   // 自动滚动到底部
   const scrollToBottom = () => {
@@ -141,30 +155,104 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
   }
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-      {/* 头部 */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-          效果验证平台
-        </h2>
-        <div className="flex items-center gap-2">
-          {isSessionStarted && (
-            <Button variant="ghost" size="sm" onClick={handleClearChat}>
-              <Trash2 className="w-4 h-4 mr-1" />
-              重置
-            </Button>
-          )}
-          <Button
-            variant={copied ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={handleCopy}
-            disabled={!extractedPrompt}
-          >
-            {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
-            {copied ? '已复制' : '复制'}
-          </Button>
+    <>
+      {/* 全屏遮罩层 */}
+      {isExpanded && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
+
+      {/* System Prompt 全屏遮罩层 */}
+      {isPromptExpanded && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsPromptExpanded(false)}
+        />
+      )}
+
+      {/* System Prompt 全屏模式 */}
+      {isPromptExpanded && (
+        <div className="fixed inset-4 md:inset-8 lg:inset-16 z-50 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-amber-500/10 to-orange-500/10">
+            <span className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+              <Sparkles className="w-5 h-5 text-primary-500" />
+              System Prompt
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={copied ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={handleCopy}
+                disabled={!extractedPrompt}
+              >
+                {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                {copied ? '已复制' : '复制'}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsPromptExpanded(false)}
+                title="退出全屏 (Esc)"
+              >
+                <Minimize2 className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="flex-1 p-4 overflow-hidden">
+            <textarea
+              value={extractedPrompt}
+              onChange={(e) => onPromptChange(e.target.value)}
+              placeholder="左侧对话生成的 Prompt 会自动显示在这里，也可以手动输入..."
+              className="w-full h-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-sm font-mono"
+            />
+          </div>
         </div>
-      </div>
+      )}
+      
+      <div className={cn(
+        "flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden transition-all duration-300",
+        isExpanded 
+          ? "fixed inset-4 z-50 md:inset-8 lg:inset-16" 
+          : "h-full"
+      )}>
+        {/* 头部 */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+            效果验证平台
+          </h2>
+          <div className="flex items-center gap-2">
+            {isSessionStarted && (
+              <Button variant="ghost" size="sm" onClick={handleClearChat}>
+                <Trash2 className="w-4 h-4 mr-1" />
+                重置
+              </Button>
+            )}
+            <Button
+              variant={copied ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={handleCopy}
+              disabled={!extractedPrompt}
+            >
+              {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+              {copied ? '已复制' : '复制'}
+            </Button>
+            {/* 放大/缩小按钮 */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              title={isExpanded ? '退出全屏 (Esc)' : '全屏查看'}
+            >
+              {isExpanded ? (
+                <Minimize2 className="w-4 h-4" />
+              ) : (
+                <Maximize2 className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+        </div>
 
       {/* 内容区域 */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -174,16 +262,25 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
           isPromptCollapsed ? "p-2" : "p-4"
         )}>
           {/* 折叠/展开按钮 */}
-          <button
-            onClick={() => setIsPromptCollapsed(!isPromptCollapsed)}
-            className="w-full flex items-center justify-between text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-          >
-            <span className="flex items-center gap-2">
+          <div className="flex items-center justify-between mb-2">
+            <button
+              onClick={() => setIsPromptCollapsed(!isPromptCollapsed)}
+              className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"
+            >
               <Sparkles className="w-4 h-4 text-primary-500" />
               System Prompt {isPromptCollapsed && extractedPrompt && '(已配置)'}
-            </span>
-            {isPromptCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-          </button>
+              {isPromptCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            </button>
+            {!isPromptCollapsed && (
+              <button
+                onClick={() => setIsPromptExpanded(true)}
+                className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                title="全屏编辑"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
           {!isPromptCollapsed && (
             <div className="space-y-3">
@@ -340,5 +437,6 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
         )}
       </div>
     </div>
+    </>
   )
 }
