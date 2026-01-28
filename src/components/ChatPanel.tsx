@@ -273,20 +273,14 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
               <p>开始对话，描述你想要的{
                 taskType === PromptType.TEXT ? '提示词' : 
                 taskType === PromptType.IMAGE ? '图片效果' : 
-                taskType === PromptType.VIDEO ? '视频效果' :
-                taskType === PromptType.RAG ? 'RAG 知识库 Prompt' :
-                'Agent 智能体'
+                '视频效果'
               }</p>
               <p className="text-sm mt-1">
                 {taskType === PromptType.TEXT 
-                  ? '系统会自动判断任务复杂度，智能切换推理模式'
+                  ? '系统会自动判断任务复杂度，智能切换推理模式，支持 RAG 知识增强'
                   : taskType === PromptType.IMAGE
-                  ? '系统会用"导演视角"结构化你的创意'
-                  : taskType === PromptType.VIDEO
-                  ? '系统会生成专业的分镜脚本和运镜指令'
-                  : taskType === PromptType.RAG
-                  ? '系统会构建带知识上下文注入的 RAG Prompt'
-                  : '系统会设计带工具调用能力的 ReAct Agent'}
+                  ? '系统会用"导演视角"结构化你的创意，支持风格参考检索'
+                  : '系统会生成专业的分镜脚本和运镜指令，支持影片风格参考'}
               </p>
             </div>
             
@@ -340,42 +334,6 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                 </span>
                 <span className="px-2 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
                   Atmosphere 氛围
-                </span>
-              </div>
-            )}
-
-            {/* RAG 模式说明 */}
-            {taskType === PromptType.RAG && (
-              <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
-                <span className="px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
-                  Knowledge 知识检索
-                </span>
-                <span className="px-2 py-1 rounded-full bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300">
-                  Context 上下文注入
-                </span>
-                <span className="px-2 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300">
-                  Grounding 防幻觉
-                </span>
-                <span className="px-2 py-1 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300">
-                  Citation 引用追踪
-                </span>
-              </div>
-            )}
-
-            {/* Agent 模式说明 */}
-            {taskType === PromptType.AGENT && (
-              <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
-                <span className="px-2 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
-                  Thought 思考
-                </span>
-                <span className="px-2 py-1 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300">
-                  Action 行动
-                </span>
-                <span className="px-2 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300">
-                  Observation 观察
-                </span>
-                <span className="px-2 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
-                  Tools 工具调用
                 </span>
               </div>
             )}
