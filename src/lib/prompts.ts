@@ -1,10 +1,10 @@
 /**
  * Gestalt 多模态提示词优化策略系统
- * 支持文本/图片/视频三种任务类型
+ * 支持文本/图片/视频/RAG/Agent 五种任务类型
  * 包含智能推理模式切换：直觉式 / CoT / ToT
  */
 
-import { PromptType, LogicMode, InteractionDetails } from './types'
+import { PromptType, LogicMode, InteractionDetails, PRESET_TOOLS, ToolDefinition } from './types'
 
 // ==========================================
 // 1. 复杂度检测
@@ -303,7 +303,274 @@ ${details.duration ? `- 用户期望时长：${details.duration}` : ''}
 }
 
 // ==========================================
-// 5. 统一入口
+// 5. RAG 知识增强策略
+// ==========================================
+
+/**
+ * 检测用户输入中可能需要的知识领域
+ */
+function detectKnowledgeDomain(userInput: string): string[] {
+  const domains: string[] = []
+  const input = userInput.toLowerCase()
+  
+  // 影视/文学领域
+  if (input.includes('流浪地球') || input.includes('三体') || input.includes('小说') || input.includes('电影')) {
+    domains.push('影视文学')
+  }
+  // 技术领域
+  if (input.includes('代码') || input.includes('编程') || input.includes('api') || input.includes('开发')) {
+    domains.push('技术文档')
+  }
+  // 商业领域
+  if (input.includes('商业') || input.includes('市场') || input.includes('产品') || input.includes('运营')) {
+    domains.push('商业分析')
+  }
+  // 学术领域
+  if (input.includes('论文') || input.includes('研究') || input.includes('学术') || input.includes('文献')) {
+    domains.push('学术研究')
+  }
+  
+  return domains.length > 0 ? domains : ['通用知识']
+}
+
+/**
+ * 构建 RAG 增强任务的系统提示词
+ * 用于基于知识库的问答和内容生成
+ */
+export function buildRAGSystemPrompt(userInput: string, details: InteractionDetails = {}): string {
+  const domains = detectKnowledgeDomain(userInput)
+  
+  return `# Role: RAG 知识增强内容架构师
+
+## Profile
+你是一位精通 RAG (Retrieval-Augmented Generation) 技术的提示词架构师。你的使命是帮助用户构建能够有效利用外部知识库的 Prompt，确保生成内容的准确性和可靠性。
+
+## Core Competencies
+1. **知识检索策略**: 设计高效的检索查询，最大化召回相关文档
+2. **上下文注入**: 将检索到的知识无缝融入 Prompt 结构
+3. **防幻觉机制**: 强制模型基于提供的上下文回答，拒绝编造
+4. **引用追踪**: 要求模型标注信息来源
+
+## Detected Knowledge Domains
+根据用户输入，检测到可能涉及的知识领域：
+${domains.map(d => `- ${d}`).join('\n')}
+
+## RAG Prompt 构建策略
+
+### 1. Knowledge Context Block (知识上下文块)
+在生成的 Prompt 中必须包含以下结构：
+
+\`\`\`
+## Knowledge Context (外部知识库)
+以下是检索到的关键事实，请严格基于此信息生成内容：
+"""
+[检索到的文档片段将注入此处]
+"""
+\`\`\`
+
+### 2. Grounding Rules (落地规则)
+- 所有事实性陈述必须能在 Knowledge Context 中找到依据
+- 如果上下文中没有相关信息，明确告知用户"根据现有知识库无法回答"
+- 使用专有名词时必须与上下文保持一致
+
+### 3. Citation Format (引用格式)
+要求模型在回答中标注来源：
+- [来源1] 表示引用了第一个知识片段
+- 可以使用脚注或括号引用
+
+## Output Format
+生成的 RAG Prompt 应包含以下结构：
+
+\`\`\`markdown
+# Role: [基于领域的专业角色]
+
+## Knowledge Context
+"""
+[此处将注入检索到的相关文档]
+"""
+
+## Task
+[用户的具体任务]
+
+## Grounding Constraints
+1. 所有回答必须基于 Knowledge Context 中的信息
+2. 不得编造或推测超出上下文的内容
+3. 如无法找到相关信息，明确说明
+
+## Citation Rules
+- 引用格式：[来源X]
+- 关键事实后必须标注来源
+
+## Output Format
+[期望的输出格式]
+\`\`\`
+
+## Interaction Style
+- 询问用户的知识库类型（PDF、网页、数据库等）
+- 建议合适的文档切分策略（chunk size）
+- 提供检索查询的优化建议
+- 说明如何处理知识库中的矛盾信息
+
+## User Input
+${userInput}
+${details.background ? `\n用户背景：${details.background}` : ''}`
+}
+
+// ==========================================
+// 6. Agent 智能体构建策略
+// ==========================================
+
+/**
+ * 根据用户输入检测可能需要的工具
+ */
+function detectRequiredTools(userInput: string): string[] {
+  const tools: string[] = []
+  const input = userInput.toLowerCase()
+  
+  if (input.includes('天气') || input.includes('气温') || input.includes('weather')) {
+    tools.push('get_current_weather')
+  }
+  if (input.includes('搜索') || input.includes('查询') || input.includes('最新') || input.includes('search')) {
+    tools.push('web_search')
+  }
+  if (input.includes('代码') || input.includes('计算') || input.includes('分析数据') || input.includes('python')) {
+    tools.push('code_interpreter')
+  }
+  if (input.includes('数据库') || input.includes('sql') || input.includes('查表')) {
+    tools.push('database_query')
+  }
+  if (input.includes('邮件') || input.includes('发送') || input.includes('通知')) {
+    tools.push('send_email')
+  }
+  
+  return tools
+}
+
+/**
+ * 格式化工具定义为 JSON Schema
+ */
+function formatToolSchema(toolNames: string[]): string {
+  const schemas = toolNames
+    .map(name => PRESET_TOOLS[name])
+    .filter(Boolean)
+    .map(tool => JSON.stringify(tool, null, 2))
+  
+  if (schemas.length === 0) {
+    return '暂无预置工具，请用户自定义工具 Schema'
+  }
+  
+  return schemas.join('\n\n')
+}
+
+/**
+ * 构建 Agent 智能体任务的系统提示词
+ * 用于创建带工具调用能力的 AI Agent
+ */
+export function buildAgentSystemPrompt(userInput: string, details: InteractionDetails = {}): string {
+  const detectedTools = detectRequiredTools(userInput)
+  const toolSchemas = formatToolSchema(detectedTools)
+  
+  return `# Role: AI Agent 架构师 (Agentic System Designer)
+
+## Profile
+你是一位专精于构建 AI Agent 系统的架构师，精通 Function Calling、MCP (Model Context Protocol)、ReAct 框架等技术。你的使命是帮助用户设计能够调用外部工具和 API 的智能体 Prompt。
+
+## Core Competencies
+1. **工具设计**: 设计清晰的工具接口和 JSON Schema
+2. **ReAct 框架**: 实现 Thought → Action → Observation → Response 循环
+3. **MCP 协议**: 理解并应用 Model Context Protocol 标准
+4. **错误处理**: 设计健壮的工具调用失败处理机制
+5. **权限控制**: 合理限制 Agent 的能力边界
+
+## Detected Tools
+根据用户输入，检测到可能需要的工具：
+${detectedTools.length > 0 ? detectedTools.map(t => `- ${t}`).join('\n') : '- 未检测到特定工具，将提供通用 Agent 框架'}
+
+## Available Tool Schemas
+\`\`\`json
+${toolSchemas}
+\`\`\`
+
+## Agent Prompt 构建策略
+
+### 1. ReAct Framework (推理-行动框架)
+\`\`\`
+## Workflow (ReAct Loop)
+1. **Thought**: 分析用户需求，判断是否需要调用工具
+2. **Action**: 如果需要，生成符合 Schema 的工具调用请求
+3. **Observation**: 接收并解析工具返回的结果
+4. **Response**: 根据观察结果生成最终回答
+
+重复 1-3 直到获得足够信息，然后执行 4
+\`\`\`
+
+### 2. Tool Calling Format (工具调用格式)
+\`\`\`json
+{
+  "tool": "tool_name",
+  "parameters": {
+    "param1": "value1",
+    "param2": "value2"
+  }
+}
+\`\`\`
+
+### 3. MCP Integration (MCP 集成)
+如需连接 MCP 服务器，Prompt 应包含：
+- 可用的 MCP 服务器列表
+- 每个服务器提供的资源和工具
+- 认证和权限说明
+
+## Output Format
+生成的 Agent Prompt 应包含以下结构：
+
+\`\`\`markdown
+# Role: [Agent 角色名称]
+
+## Capabilities
+你是一个拥有外部工具调用能力的智能体。
+
+## Available Tools
+[工具列表及 JSON Schema]
+
+## Workflow (ReAct)
+1. **Thought**: 分析用户需求
+   - 这个问题需要什么信息？
+   - 是否需要调用工具？
+   - 调用哪个工具？
+
+2. **Action**: 如需调用工具，输出：
+   \\\`\\\`\\\`json
+   {"tool": "xxx", "parameters": {...}}
+   \\\`\\\`\\\`
+
+3. **Observation**: 接收工具返回结果
+
+4. **Response**: 综合所有信息，回答用户
+
+## Constraints
+- 每次只能调用一个工具
+- 必须等待工具返回后才能继续
+- 工具调用失败时提供备选方案
+- 不要编造工具不存在的功能
+
+## Error Handling
+[工具调用失败的处理策略]
+\`\`\`
+
+## Interaction Style
+- 询问用户需要集成哪些外部服务
+- 帮助用户设计自定义工具的 Schema
+- 解释 ReAct 循环的工作原理
+- 提供工具调用的最佳实践建议
+
+## User Input
+${userInput}
+${details.background ? `\n用户背景：${details.background}` : ''}`
+}
+
+// ==========================================
+// 7. 统一入口
 // ==========================================
 
 /**
@@ -320,6 +587,10 @@ export function getCompilerSystemPrompt(
       return buildImageSystemPrompt(userInput, details)
     case PromptType.VIDEO:
       return buildVideoSystemPrompt(userInput, details)
+    case PromptType.RAG:
+      return buildRAGSystemPrompt(userInput, details)
+    case PromptType.AGENT:
+      return buildAgentSystemPrompt(userInput, details)
     case PromptType.TEXT:
     default:
       return buildTextSystemPrompt(userInput, details)
@@ -340,7 +611,7 @@ export function getLogicModeLabel(mode: LogicMode): string {
 }
 
 // ==========================================
-// 6. 辅助函数
+// 8. 辅助函数
 // ==========================================
 
 /**
@@ -402,5 +673,17 @@ export const EXAMPLE_QUESTIONS: Record<PromptType, string[]> = {
     '城市日出延时摄影，从黑夜到白天',
     '一滴水落入平静的湖面，产生涟漪',
     '宇航员在太空中漂浮，地球作为背景',
+  ],
+  [PromptType.RAG]: [
+    '根据流浪地球的设定写一段移山计划的宣传语',
+    '基于公司产品文档回答客户问题的客服 Agent',
+    '根据论文库回答学术问题的研究助手',
+    '基于法律条文回答法律咨询的律师助手',
+  ],
+  [PromptType.AGENT]: [
+    '做一个能查询天气的智能助手',
+    '构建一个能搜索网页并总结的研究 Agent',
+    '设计一个能执行代码进行数据分析的助手',
+    '创建一个能发送邮件和管理日程的秘书 Agent',
   ]
 }
