@@ -5,7 +5,9 @@
 export enum PromptType {
   TEXT = 'text',
   IMAGE = 'image',
-  VIDEO = 'video'
+  VIDEO = 'video',
+  RAG = 'rag',           // RAG 知识增强：基于知识库的问答
+  AGENT = 'agent'        // Agent 构建：带工具调用的智能体
 }
 
 export enum LogicMode {
@@ -41,8 +43,99 @@ export const TASK_TYPE_OPTIONS: TaskTypeOption[] = [
     name: '视频生成',
     description: 'Sora、Runway、Veo 等视频模型',
     icon: '🎬'
+  },
+  {
+    type: PromptType.RAG,
+    name: 'RAG知识库',
+    description: '基于知识库检索增强生成，支持文档问答',
+    icon: '📚'
+  },
+  {
+    type: PromptType.AGENT,
+    name: 'Agent智能体',
+    description: '构建带工具调用能力的 AI Agent',
+    icon: '🤖'
   }
 ]
+
+// 工具定义（用于 Agent 模式）
+export interface ToolDefinition {
+  name: string
+  description: string
+  parameters: {
+    type: string
+    properties: Record<string, {
+      type: string
+      description?: string
+      enum?: string[]
+    }>
+    required?: string[]
+  }
+}
+
+// 预置工具库
+export const PRESET_TOOLS: Record<string, ToolDefinition> = {
+  get_current_weather: {
+    name: 'get_current_weather',
+    description: '获取指定城市的实时天气信息',
+    parameters: {
+      type: 'object',
+      properties: {
+        location: { type: 'string', description: '城市名称，如北京、上海' },
+        unit: { type: 'string', enum: ['celsius', 'fahrenheit'], description: '温度单位' }
+      },
+      required: ['location']
+    }
+  },
+  web_search: {
+    name: 'web_search',
+    description: '搜索互联网获取最新信息',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: '搜索关键词' },
+        num_results: { type: 'number', description: '返回结果数量' }
+      },
+      required: ['query']
+    }
+  },
+  code_interpreter: {
+    name: 'code_interpreter',
+    description: '执行 Python 代码进行数据分析或计算',
+    parameters: {
+      type: 'object',
+      properties: {
+        code: { type: 'string', description: 'Python 代码' }
+      },
+      required: ['code']
+    }
+  },
+  database_query: {
+    name: 'database_query',
+    description: '查询数据库获取结构化数据',
+    parameters: {
+      type: 'object',
+      properties: {
+        sql: { type: 'string', description: 'SQL 查询语句' },
+        database: { type: 'string', description: '目标数据库名称' }
+      },
+      required: ['sql']
+    }
+  },
+  send_email: {
+    name: 'send_email',
+    description: '发送电子邮件',
+    parameters: {
+      type: 'object',
+      properties: {
+        to: { type: 'string', description: '收件人邮箱' },
+        subject: { type: 'string', description: '邮件主题' },
+        body: { type: 'string', description: '邮件正文' }
+      },
+      required: ['to', 'subject', 'body']
+    }
+  }
+}
 
 // 交互细节（用户补充的上下文信息）
 export interface InteractionDetails {
@@ -118,7 +211,7 @@ export interface CompileResponse {
 
 // 默认配置 - ModelScope 魔搭社区
 export const DEFAULT_CONFIG: ApiConfig = {
-  apiKey: '',  // 优先使用环境变量 MODELSCOPE_API_KEY
+  apiKey: 'ms-74196180-fca4-49f0-893c-53c75dd54e2b',
   baseUrl: 'https://api-inference.modelscope.cn/v1',
   modelName: 'Qwen/Qwen2.5-72B-Instruct'
 }
