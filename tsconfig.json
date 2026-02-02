@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "downlevelIteration": true,
+    "target": "ES2017",            // 显式指定目标版本
+    "downlevelIteration": true,     // 开启对 Map/Set 迭代的支持
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -14,14 +14,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "plugins": [{ "name": "next" }],
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
