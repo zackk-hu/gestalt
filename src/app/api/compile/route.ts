@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCompilerSystemPrompt } from '@/lib/prompts'
 import { Message, PromptType } from '@/lib/types'
+import { getTerminologyTranslator, EnhancedPromptBuilder } from '@/lib/rag'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -35,15 +36,67 @@ export async function POST(request: NextRequest) {
     const lastUserMessage = messages.filter(m => m.role === 'user').pop()
     const userInput = lastUserMessage?.content || ''
 
-    // 根据任务类型获取对应的系统提示词
-    const systemPrompt = getCompilerSystemPrompt(taskType, userInput)
+    // 尝试使用术语翻译器增强用户输入
+    const translator = getTerminologyTranslator()
+    let enhancedSystemPrompt = getCompilerSystemPrompt(taskType, userInput)
+    
+    // 如果术语库已初始化，尝试使用RAG增强
+    if (translator.isInitialized()) {
+      try {
+        // 由于这里无法直接计算向量，我们使用编译API的密钥来获取向量
+        const embeddingResponse = await fetch(`${process.env.MODELSCOPE_BASE_URL || 'https://api-inference.modelscope.cn/v1'}/embeddings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: 'AI-ModelScope/bge-large-zh-v1.5',
+            input: userInput,
+            encoding_format: 'float'
+          })
+        })
+        
+        if (embeddingResponse.ok) {
+          const embeddingData = await embeddingResponse.json()
+          const queryVector = embeddingData.data?.[0]?.embedding
+          
+          if (queryVector) {
+            const translationResult = await translator.translate(userInput, queryVector)
+            
+            // 检查是否需要澄清（如果RAG系统返回了澄清请求）
+            if (translationResult.needs_clarification && translationResult.clarification) {
+              // 如果需要澄清，直接返回澄清请求
+              return NextResponse.json({
+                success: true,
+                result: null,
+                metadata: {
+                  needs_clarification: true,
+                  clarification: translationResult.clarification,
+                  tokensUsed: 0,
+                  processingTime: Date.now() - startTime,
+                  rag_enhanced: true,
+                }
+              });
+            } else if (translationResult.enhanced_prompt) {
+              // 使用增强的提示词
+              enhancedSystemPrompt = translationResult.enhanced_prompt
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('RAG增强失败，使用原始系统提示词:', e)
+        // 出错时继续使用原始提示词
+      }
+    }
 
     const baseUrl = process.env.MODELSCOPE_BASE_URL || config.baseUrl || 'https://api-inference.modelscope.cn/v1'
     const modelName = config.modelName || 'Qwen/Qwen2.5-72B-Instruct'
 
+    
     // 构建消息列表（包含系统提示词和对话历史）
     const apiMessages = [
-      { role: 'system', content: systemPrompt },
+      { role: 'system', content: enhancedSystemPrompt },
       ...messages.map(m => ({ role: m.role, content: m.content }))
     ]
 
@@ -89,6 +142,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         tokensUsed: data.usage?.total_tokens,
         processingTime,
+        rag_enhanced: translator.isInitialized(), // 标记是否使用了RAG增强
       }
     })
 

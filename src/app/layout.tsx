@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { ProtectedLayout } from '@/components/ProtectedLayout'
 
 export const metadata: Metadata = {
   title: 'Gestalt — AI提示词编译器',
@@ -15,9 +16,9 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="font-sans antialiased">
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <ProtectedLayout>
           {children}
-        </div>
+        </ProtectedLayout>
       </body>
     </html>
   )

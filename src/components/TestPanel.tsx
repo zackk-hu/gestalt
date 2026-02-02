@@ -215,7 +215,7 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
         "flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden transition-all duration-300",
         isExpanded 
           ? "fixed inset-4 z-50 md:inset-8 lg:inset-16" 
-          : "h-full"
+          : "flex-1 min-h-[500px]"
       )}>
         {/* 头部 */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
@@ -237,19 +237,6 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
             >
               {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
               {copied ? '已复制' : '复制'}
-            </Button>
-            {/* 放大/缩小按钮 */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              title={isExpanded ? '退出全屏 (Esc)' : '全屏查看'}
-            >
-              {isExpanded ? (
-                <Minimize2 className="w-4 h-4" />
-              ) : (
-                <Maximize2 className="w-4 h-4" />
-              )}
             </Button>
           </div>
         </div>
@@ -284,12 +271,14 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
 
           {!isPromptCollapsed && (
             <div className="space-y-3">
-              <textarea
-                value={extractedPrompt}
-                onChange={(e) => onPromptChange(e.target.value)}
-                placeholder="左侧对话生成的 Prompt 会自动显示在这里，也可以手动输入..."
-                className="w-full h-32 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-sm font-mono"
-              />
+              <div>
+                <textarea
+                  value={extractedPrompt}
+                  onChange={(e) => onPromptChange(e.target.value)}
+                  placeholder="左侧对话生成的 Prompt 会自动显示在这里，也可以手动输入..."
+                  className="w-full h-32 px-3 py-2 pr-10 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none text-sm font-mono"
+                />
+              </div>
 
               {/* 模型选择 */}
               <div className="relative">
@@ -343,8 +332,8 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
 
         {/* 对话区域 */}
         {isSessionStarted ? (
-          <>
-            {/* 消息列表 */}
+          <div className="flex flex-col flex-1 h-full">
+            {/* 消息列表 - 占据剩余高度并内部滚动 */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {chatMessages.length === 0 ? (
                 <div className="text-center py-8 text-slate-400 dark:text-slate-500">
@@ -353,34 +342,36 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
                   <p className="text-xs mt-1">System Prompt 已配置，开始提问吧</p>
                 </div>
               ) : (
-                chatMessages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={cn(
-                      'flex gap-3',
-                      message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                    )}
-                  >
-                    <div className={cn(
-                      'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0',
-                      message.role === 'user' 
-                        ? 'bg-primary-500 text-white' 
-                        : 'bg-green-500 text-white'
-                    )}>
-                      {message.role === 'user' ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
-                    </div>
-                    <div className={cn(
-                      'max-w-[85%] px-3 py-2 rounded-xl text-sm',
-                      message.role === 'user'
-                        ? 'bg-primary-500 text-white rounded-tr-sm'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-tl-sm'
-                    )}>
-                      <div className="whitespace-pre-wrap">
-                        {message.content}
+                <div className="space-y-4">
+                  {chatMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={cn(
+                        'flex gap-3',
+                        message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                      )}
+                    >
+                      <div className={cn(
+                        'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0',
+                        message.role === 'user' 
+                          ? 'bg-primary-500 text-white' 
+                          : 'bg-green-500 text-white'
+                      )}>
+                        {message.role === 'user' ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
+                      </div>
+                      <div className={cn(
+                        'max-w-[85%] px-3 py-2 rounded-xl text-sm',
+                        message.role === 'user'
+                          ? 'bg-primary-500 text-white rounded-tr-sm'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-tl-sm'
+                      )}>
+                        <div className="whitespace-pre-wrap break-words max-h-40 overflow-y-auto">
+                          {message.content}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
               
               {isLoading && (
@@ -397,8 +388,8 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
               <div ref={messagesEndRef} />
             </div>
 
-            {/* 输入区域 */}
-            <div className="p-3 border-t border-slate-200 dark:border-slate-700">
+            {/* 输入区域 - 固定在底部 */}
+            <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 sticky bottom-0 z-10">
               <div className="flex gap-2">
                 <textarea
                   ref={inputRef}
@@ -424,7 +415,7 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
                 <span>{chatMessages.length} 条消息</span>
               </div>
             </div>
-          </>
+          </div>
         ) : (
           /* 未开始对话时的提示 */
           <div className="flex-1 flex items-center justify-center p-4">

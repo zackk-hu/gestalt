@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
 import { Send, Trash2, User, Bot, Loader2, Pencil, Check, X, Zap, Brain, GitBranch, FileText, Image as ImageIcon, Video, Paperclip, File, XCircle, RotateCcw } from 'lucide-react'
@@ -389,26 +389,66 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     setClarificationRequest(null);
   };
 
+  const [isPromptExpanded, setIsPromptExpanded] = useState(false);
+  const [expandedPrompt, setExpandedPrompt] = useState('');
+  
+  const handleExpandPrompt = (prompt: string) => {
+    setExpandedPrompt(prompt);
+    setIsPromptExpanded(true);
+  };
+  
+  const closePromptExpansion = () => {
+    setIsPromptExpanded(false);
+    setExpandedPrompt('');
+  };
+  
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-      {/* 头部 */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10">
-        <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-            提示词编译车间
-          </h2>
-          {lastReasoningMode && (
-            <ReasoningModeTag 
-              mode={lastReasoningMode.mode} 
-              complexity={lastReasoningMode.complexity} 
+    <>
+      {/* 全屏 Prompt 编辑 */}
+      {isPromptExpanded && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-4xl h-5/6 flex flex-col">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+              <h3 className="font-semibold text-slate-900 dark:text-white">全屏编辑 Prompt</h3>
+              <Button variant="ghost" size="sm" onClick={closePromptExpansion}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <textarea
+              value={expandedPrompt}
+              onChange={(e) => setExpandedPrompt(e.target.value)}
+              className="flex-1 p-4 w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-white resize-none focus:outline-none font-mono text-sm"
+              placeholder="在这里编辑您的 Prompt..."
             />
-          )}
+            <div className="flex justify-end gap-2 p-3 border-t border-slate-200 dark:border-slate-700">
+              <Button variant="outline" onClick={closePromptExpansion}>取消</Button>
+              <Button variant="primary" onClick={() => { onPromptExtracted(expandedPrompt); closePromptExpansion(); }}>
+                保存并关闭
+              </Button>
+            </div>
+          </div>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleClear}>
-          <Trash2 className="w-4 h-4 mr-1" />
-          清空
-        </Button>
-      </div>
+      )}
+      
+      <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+        {/* 头部 */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+              提示词编译车间
+            </h2>
+            {lastReasoningMode && (
+              <ReasoningModeTag 
+                mode={lastReasoningMode.mode} 
+                complexity={lastReasoningMode.complexity} 
+              />
+            )}
+          </div>
+          <Button variant="ghost" size="sm" onClick={handleClear}>
+            <Trash2 className="w-4 h-4 mr-1" />
+            清空
+          </Button>
+        </div>
 
       {/* 任务类型选择器 */}
       <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
@@ -758,5 +798,5 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         </p>
       </div>
     </div>
-  )
-}
+  </>
+)

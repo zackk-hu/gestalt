@@ -78,10 +78,10 @@ function detectKnowledgeDomain(userInput: string): string[] {
  * 生成 RAG 知识检索增强的 Prompt 片段
  * 这个模块会被融合到所有任务类型的策略中
  */
-function buildRAGEnhancement(userInput: string, details: InteractionDetails = {}): string {
+function buildRAGEnhancement(userInput: string, details: InteractionDetails = {}, ragContext?: string): string {
   const domains = detectKnowledgeDomain(userInput)
   
-  if (domains.length === 0 && !details.knowledgeContext) {
+  if (domains.length === 0 && !details.knowledgeContext && !ragContext) {
     return ''
   }
   
@@ -98,15 +98,20 @@ ${domains.map(d => `- ${d}`).join('\n')}`
   }
 
   ragSection += `
-
+  
 ### Knowledge Context Block (知识上下文块)
 \`\`\`
 ## Knowledge Context (外部知识库)
 以下是检索到的关键事实，请严格基于此信息生成内容：
-"""
-[检索到的文档片段将注入此处]
-"""
-\`\`\`
+\"\"\"\n`
+
+  if (ragContext) {
+    ragSection += ragContext
+  } else if (details.knowledgeContext) {
+    ragSection += details.knowledgeContext
+  }
+
+  ragSection += `\"\"\"\n\`\`\`
 
 ### Grounding Rules (防幻觉规则)
 - 所有事实性陈述必须能在 Knowledge Context 中找到依据
@@ -116,13 +121,6 @@ ${domains.map(d => `- ${d}`).join('\n')}`
 ### Citation Format (引用格式)
 - 要求模型标注来源：[来源1]、[来源2]
 - 关键事实后必须标注引用`
-
-  if (details.knowledgeContext) {
-    ragSection += `
-
-### 用户提供的知识上下文
-${details.knowledgeContext}`
-  }
 
   return ragSection
 }
