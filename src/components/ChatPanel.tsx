@@ -1,4 +1,4 @@
-﻿'use client'
+﻿﻿'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
 import { Send, Trash2, User, Bot, Loader2, Pencil, Check, X, Zap, Brain, GitBranch, FileText, Image as ImageIcon, Video, Paperclip, File, XCircle, RotateCcw } from 'lucide-react'
@@ -135,7 +135,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
 
     const remainingSlots = MAX_FILES - attachments.length
     const filesToAdd = Array.from(files).slice(0, remainingSlots)
-
+    
     const newAttachments: FileAttachment[] = filesToAdd.map(file => {
       const fileType = getFileType(file)
       const attachment: FileAttachment = {
@@ -151,10 +151,11 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
       }
       return attachment
     })
-
+    
     setAttachments(prev => [...prev, ...newAttachments])
     // 重置input以允许重复选择同一文件
     if (fileInputRef.current) fileInputRef.current.value = ''
+
   }
 
   // 移除附件
@@ -187,9 +188,9 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
           taskType,  // 传递任务类型
         }),
       })
-
+    
       const data = await response.json()
-
+    
       if (data.success) {
         // 检查是否需要澄清
         if (data.metadata?.needs_clarification) {
@@ -210,13 +211,13 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
             timestamp: Date.now()
           }
           setMessages(prev => [...prev, assistantMessage])
-
+    
           // 尝试提取推理模式
           const reasoningMode = extractReasoningMode(data.result)
           if (reasoningMode) {
             setLastReasoningMode(reasoningMode)
           }
-
+    
           // 尝试提取 Prompt
           const extractedPrompt = extractPromptFromResponse(data.result)
           if (extractedPrompt) {
@@ -243,6 +244,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     } finally {
       setIsLoading(false)
     }
+
   }
 
   // 发送新消息
@@ -259,14 +261,14 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         ? `${messageContent}\n\n---\n${attachmentInfo}`
         : attachmentInfo
     }
-
+    
     const userMessage: Message = {
       id: generateId(),
       role: 'user',
       content: messageContent,
       timestamp: Date.now()
     }
-
+    
     setMessages(prev => [...prev, userMessage])
     setInput('')
     // 清空附件并释放预览URL
@@ -276,6 +278,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     setAttachments([])
     
     await sendMessage(messages, userMessage)
+
   }
 
   // 开始编辑消息
@@ -297,7 +300,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     // 找到被编辑消息的索引
     const editIndex = messages.findIndex(m => m.id === messageId)
     if (editIndex === -1) return
-
+    
     // 保留该消息之前的所有消息
     const previousMessages = messages.slice(0, editIndex)
     
@@ -308,14 +311,15 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
       content: editingContent.trim(),
       timestamp: Date.now()
     }
-
+    
     // 更新消息列表（删除编辑消息及之后的所有消息，添加新的编辑消息）
     setMessages([...previousMessages, editedMessage])
     setEditingMessageId(null)
     setEditingContent('')
-
+    
     // 重新发送
     await sendMessage(previousMessages, editedMessage)
+
   }
 
   // 处理编辑框键盘事件
@@ -360,6 +364,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
   const handleClarificationSelect = async (optionId: string) => {
     if (!clarificationRequest) return;
     
+
     // 添加用户的选择作为消息
     const userChoiceMessage: Message = {
       id: generateId(),
@@ -382,6 +387,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     };
     
     await sendMessage(messages, refinedMessage);
+
   };
 
   // 重试澄清请求
@@ -390,9 +396,9 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-      {/* 头部 */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden" style={{ minHeight: 0 }}>
+      {/* 头部 (Fixed) */}
+      <div className="flex-none flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10 z-10">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
             提示词编译车间
@@ -410,8 +416,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         </Button>
       </div>
 
-      {/* 任务类型选择器 */}
-      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+      {/* 任务类型选择器 (Fixed) */}
+      <div className="flex-none px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 z-10">
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-500 dark:text-slate-400">任务类型：</span>
           <div className="flex gap-1">
@@ -434,9 +440,10 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
           </div>
         </div>
       </div>
-
-      {/* 消息列表 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    
+      {/* 消息列表 (Flexible & Scrollable) */}
+      {/* 关键修改：flex-1 overflow-y-auto min-h-0 确保只在这个区域内滚动 */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-slate-900 scroll-smooth" style={{ minHeight: 0 }}>
         {messages.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-slate-400 dark:text-slate-500 mb-4">
@@ -472,7 +479,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                 </div>
               </div>
             )}
-
+    
             {/* 图片模式说明 */}
             {taskType === PromptType.IMAGE && (
               <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
@@ -490,7 +497,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                 </span>
               </div>
             )}
-
+    
             {/* 视频模式说明 */}
             {taskType === PromptType.VIDEO && (
               <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
@@ -508,7 +515,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                 </span>
               </div>
             )}
-
+    
             <div className="flex flex-wrap justify-center gap-2 mt-4">
               {EXAMPLE_QUESTIONS[taskType].slice(0, 4).map((example, index) => (
                 <button
@@ -660,12 +667,13 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         
         <div ref={messagesEndRef} />
       </div>
-
-      {/* 输入区域 */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+    
+      {/* 输入区域 (Fixed at bottom) */}
+      {/* 关键修改：flex-none 防止被压缩，z-10 提升层级，bg-white 防止背景透明 */}
+      <div className="flex-none border-t border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 z-10">
         {/* 附件预览列表 */}
         {attachments.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {attachments.map(att => (
               <div 
                 key={att.id}
@@ -712,7 +720,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
             )}
           </div>
         )}
-
+    
         {/* 隐藏的文件输入 */}
         <input
           ref={fileInputRef}
@@ -722,7 +730,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
           onChange={handleFileSelect}
           className="hidden"
         />
-
+    
         <div className="flex gap-2">
           {/* 上传按钮 */}
           <Button
@@ -753,10 +761,11 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-xs text-slate-400 mt-2">
+        <p className="text-xs text-slate-400">
           悬停消息可编辑 · 支持上传图片/文档 (最多{MAX_FILES}个) · 当前模式：{TASK_TYPE_OPTIONS.find(o => o.type === taskType)?.name}
         </p>
       </div>
     </div>
+
   )
 }
