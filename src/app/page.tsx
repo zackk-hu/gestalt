@@ -77,9 +77,9 @@ export default function Home() {
       {/* 主内容 - 左右分栏 */}
       <div className="flex-1 px-4 pb-8">
         <div className="max-w-7xl mx-auto h-[calc(100vh-280px)] min-h-[500px]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full w-full">
             {/* 左侧：对话编译器 */}
-            <div className="transform transition-all duration-500 hover:scale-[1.01] h-full">
+            <div className="transform transition-all duration-500 hover:scale-[1.01] h-full w-full">
               <ChatPanel 
                 config={config} 
                 onPromptExtracted={setExtractedPrompt} 
@@ -87,7 +87,7 @@ export default function Home() {
             </div>
 
             {/* 右侧：测试平台 */}
-            <div className="transform transition-all duration-500 hover:scale-[1.01] h-full">
+            <div className="transform transition-all duration-500 hover:scale-[1.01] h-full w-full">
               <TestPanel 
                 config={config} 
                 extractedPrompt={extractedPrompt}

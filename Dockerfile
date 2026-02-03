@@ -23,7 +23,7 @@ ENV HOSTNAME=0.0.0.0
 
 # 确保静态资源被正确链接（standalone 模式必需）
 RUN cp -r .next/static .next/standalone/.next/static
-RUN cp -r public .next/standalone/public
+RUN if [ -d public ]; then cp -r public .next/standalone/public; fi
 
 # 暴露端口
 EXPOSE 7860

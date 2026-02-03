@@ -396,7 +396,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden" style={{ minHeight: 0 }}>
+    <div className="flex flex-col h-full w-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden" style={{ minHeight: 0 }}>
       {/* 头部 (Fixed) */}
       <div className="flex-none flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10 z-10">
         <div className="flex items-center gap-3">
@@ -669,8 +669,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
       </div>
     
       {/* 输入区域 (Fixed at bottom) */}
-      {/* 关键修改：flex-none 防止被压缩，z-10 提升层级，bg-white 防止背景透明 */}
-      <div className="flex-none border-t border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 z-10">
+      {/* 关键修改：flex-none 防止被压缩，z-10 提升层级，bg-white 防止背景透明，w-full 确保宽度充满 */}
+      <div className="flex-none w-full border-t border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 z-10">
         {/* 附件预览列表 */}
         {attachments.length > 0 && (
           <div className="flex flex-wrap gap-2">
