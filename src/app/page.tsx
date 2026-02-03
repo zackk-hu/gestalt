@@ -38,7 +38,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50/50 via-slate-100/30 to-slate-200/20 dark:from-slate-900/50 dark:via-slate-800/40 dark:to-slate-700/30">
+    <main className="h-screen flex flex-col bg-gradient-to-br from-slate-50/50 via-slate-100/30 to-slate-200/20 dark:from-slate-900/50 dark:via-slate-800/40 dark:to-slate-700/30 overflow-hidden">
       {/* 配置面板 */}
       <ConfigPanel config={config} onConfigChange={setConfig} />
 
@@ -75,8 +75,8 @@ export default function Home() {
       </header>
 
       {/* 主内容 - 左右分栏 */}
-      <div className="flex-1 px-4 pb-8">
-        <div className="max-w-7xl mx-auto h-[calc(100vh-280px)] min-h-[500px]">
+      <div className="flex-1 px-4 pb-4 overflow-hidden">
+        <div className="h-full max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full w-full">
             {/* 左侧：对话编译器 */}
             <div className="transform transition-all duration-500 hover:scale-[1.01] h-full w-full">
