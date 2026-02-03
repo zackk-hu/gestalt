@@ -396,7 +396,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden" style={{ minHeight: 0 }}>
+    <div className="flex flex-col h-[600px] bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden" style={{ minHeight: 0 }}>
       {/* 头部 (Fixed) */}
       <div className="flex-none flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10 z-10">
         <div className="flex items-center gap-3">

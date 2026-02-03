@@ -215,7 +215,7 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
         "flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden transition-all duration-300",
         isExpanded 
           ? "fixed inset-4 z-50 md:inset-8 lg:inset-16" 
-          : "flex-1 min-h-[500px]"
+          : "h-[600px]"
       )}>
         {/* 头部 */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
