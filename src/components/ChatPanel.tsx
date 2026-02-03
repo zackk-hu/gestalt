@@ -396,9 +396,9 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden" style={{ minHeight: 0 }}>
+    <div className="flex flex-col h-full w-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden" style={{ minHeight: 0, display: 'flex' }}>
       {/* 头部 (Fixed) */}
-      <div className="flex-none flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10 z-10">
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10 z-10">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
             提示词编译车间
@@ -417,7 +417,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
       </div>
 
       {/* 任务类型选择器 (Fixed) */}
-      <div className="flex-none px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 z-10">
+      <div className="flex-shrink-0 px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 z-10">
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-500 dark:text-slate-400">任务类型：</span>
           <div className="flex gap-1">
@@ -443,7 +443,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     
       {/* 消息列表 (Flexible & Scrollable) */}
       {/* 关键修改：flex-1 overflow-y-auto min-h-0 确保只在这个区域内滚动 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-slate-900 scroll-smooth" style={{ minHeight: 0 }}>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-white dark:bg-slate-900 scroll-smooth" style={{ minHeight: 0 }}>
         {messages.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-slate-400 dark:text-slate-500 mb-4">
@@ -669,8 +669,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
       </div>
     
       {/* 输入区域 (Fixed at bottom) */}
-      {/* 关键修改：flex-none 防止被压缩，z-10 提升层级，bg-white 防止背景透明，w-full 确保宽度充满 */}
-      <div className="flex-none w-full border-t border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 z-10">
+      {/* 关键修改：flex-shrink-0 防止被压缩，z-10 提升层级，bg-white 防止背景透明，w-full 确保宽度充满 */}
+      <div className="flex-shrink-0 w-full border-t border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 z-10">
         {/* 附件预览列表 */}
         {attachments.length > 0 && (
           <div className="flex flex-wrap gap-2">

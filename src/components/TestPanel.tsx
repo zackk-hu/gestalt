@@ -216,7 +216,7 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
         isExpanded 
           ? "fixed inset-4 z-50 md:inset-8 lg:inset-16" 
           : "flex-1 min-h-[500px]"
-      )}>
+      )} style={{ display: 'flex' }}>
         {/* 头部 */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -332,9 +332,9 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
 
         {/* 对话区域 */}
         {isSessionStarted ? (
-          <div className="flex flex-col flex-1 h-full w-full" style={{ minHeight: 0 }}>
+          <div className="flex flex-col flex-1 h-full w-full" style={{ minHeight: 0, display: 'flex' }}>
             {/* 消息列表 - 占据剩余高度并内部滚动 */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ minHeight: 0 }}>
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4" style={{ minHeight: 0 }}>
               {chatMessages.length === 0 ? (
                 <div className="text-center py-8 text-slate-400 dark:text-slate-500">
                   <Bot className="w-10 h-10 mx-auto mb-2 opacity-50" />
@@ -389,7 +389,7 @@ export function TestPanel({ config, extractedPrompt, onPromptChange }: TestPanel
             </div>
 
             {/* 输入区域 - 固定在底部 */}
-            <div className="w-full p-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 sticky bottom-0 z-10">
+            <div className="flex-shrink-0 w-full p-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 z-10">
               <div className="flex gap-2">
                 <textarea
                   ref={inputRef}
