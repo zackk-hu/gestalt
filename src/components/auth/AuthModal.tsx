@@ -15,7 +15,8 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    domain: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -115,10 +116,23 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
         className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* 品牌头部 */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 p-6 border-b border-slate-200 dark:border-slate-600">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">G</span>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Gestalt</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400">AI 提示词优化平台</p>
+            </div>
+          </div>
+        </div>
+
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              {isLogin ? '欢迎回来' : '创建账户'}
+              {isLogin ? '🎉 欢迎回来' : '✨ 创建账户'}
             </h2>
             <button
               onClick={onClose}
@@ -154,7 +168,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     value={formData.name}
                     onChange={handleChange}
                     required={!isLogin}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="请输入姓名"
                   />
                 </div>
@@ -173,11 +187,35 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="请输入邮箱地址"
                 />
               </div>
             </div>
+
+            {!isLogin && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  专业领域（可选）
+                </label>
+                <select
+                  name="domain"
+                  value={formData.domain}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                >
+                  <option value="">选择你的专业领域</option>
+                  <option value="nlp">NLP / 自然语言处理</option>
+                  <option value="cv">计算机视觉</option>
+                  <option value="ml">机器学习工程</option>
+                  <option value="ai-product">AI 产品设计</option>
+                  <option value="prompt-engineer">提示词工程</option>
+                  <option value="content">内容创作</option>
+                  <option value="education">教育培训</option>
+                  <option value="other">其他领域</option>
+                </select>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -191,7 +229,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-12 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-12 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="请输入密码"
                 />
                 <button
@@ -208,14 +246,25 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
               </div>
             </div>
 
+            {/* 安全与隐私提示 */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
+              <div className="flex gap-2">
+                <span className="text-lg">🔒</span>
+                <div>
+                  <p className="font-medium text-blue-900 dark:text-blue-300">隐私保护</p>
+                  <p className="text-xs text-blue-800 dark:text-blue-400 mt-0.5">您的数据已加密存储，我们严格保护您的隐私。</p>
+                </div>
+              </div>
+            </div>
+
             <Button
               type="submit"
               variant="primary"
-              className="w-full py-3 font-medium"
+              className="w-full py-3 font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
               loading={loading}
               disabled={loading}
             >
-              {loading ? '处理中...' : isLogin ? '登录' : '注册'}
+              {loading ? '处理中...' : isLogin ? '🚀 开始优化提示词' : '✨ 免费创建账户'}
             </Button>
           </form>
 
@@ -225,9 +274,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
               <button
                 type="button"
                 onClick={toggleAuthMode}
-                className="ml-1 text-primary-500 hover:text-primary-600 font-medium transition-colors"
+                className="ml-1 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
               >
-                {isLogin ? '立即注册' : '立即登录'}
+                {isLogin ? '免费注册' : '立即登录'}
               </button>
             </p>
           </div>
