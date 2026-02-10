@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { ConfigPanel } from '@/components/ConfigPanel'
 import { ChatPanel } from '@/components/ChatPanel'
 import { TestPanel } from '@/components/TestPanel'
+import { PromptBookRoom } from '@/components/PromptBookRoom'
+import { PromptEvaluationPanel } from '@/components/PromptEvaluationPanel'
 import { ApiConfig, DEFAULT_CONFIG } from '@/lib/types'
 
 export default function Home() {
@@ -37,12 +39,12 @@ export default function Home() {
   }
 
   return (
-    <main className="h-full flex flex-col overflow-hidden">
+    <main className="h-full flex flex-col overflow-y-auto">
       {/* 配置面板 */}
       <ConfigPanel config={config} onConfigChange={setConfig} />
 
-      {/* 主内容 - 左右分栏 */}
-      <div className="flex-1 min-h-0 px-4 py-4">
+      {/* 主内容 - 左右分栏（固定高度区域） */}
+      <div className="flex-none px-4 py-4" style={{ height: 'calc(100vh - 120px)', minHeight: '500px' }}>
         <div className="max-w-7xl mx-auto h-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
             {/* 左侧：对话编译器 */}
@@ -64,6 +66,22 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* 分隔线 */}
+      <div className="max-w-7xl mx-auto w-full px-4">
+        <div className="border-t border-gray-200 dark:border-slate-700/50" />
+      </div>
+
+      {/* 提示词优化评价 */}
+      <PromptEvaluationPanel />
+
+      {/* 分隔线 */}
+      <div className="max-w-7xl mx-auto w-full px-4">
+        <div className="border-t border-gray-200 dark:border-slate-700/50" />
+      </div>
+
+      {/* AI 书房 */}
+      <PromptBookRoom />
     </main>
   )
 }
