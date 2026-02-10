@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { isAuthenticated, getCurrentUser, logout } from '@/lib/auth'
-import { AuthModal } from './auth/AuthModal'
-import { User, LogOut } from 'lucide-react'
+import { LandingPage } from './LandingPage'
+import { User, LogOut, Sun, Moon } from 'lucide-react'
 import { Button } from './Button'
+import { useI18n } from '@/lib/i18n'
+import { useTheme } from '@/lib/theme'
 
 interface ProtectedLayoutProps {
   children: React.ReactNode
@@ -12,11 +14,11 @@ interface ProtectedLayoutProps {
 
 export function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const [isAuthenticatedState, setIsAuthenticatedState] = useState<boolean | null>(null)
-  const [showAuthModal, setShowAuthModal] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const { t, locale, setLocale } = useI18n()
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
-    // 初始化认证状态
     const checkAuth = () => {
       const auth = isAuthenticated()
       setIsAuthenticatedState(auth)
@@ -28,7 +30,6 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
 
     checkAuth()
 
-    // 监听storage变化，以便在其他标签页登录/登出时更新状态
     const handleStorageChange = () => {
       checkAuth()
     }
@@ -40,7 +41,6 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const handleAuthSuccess = (user: any) => {
     setCurrentUser(user)
     setIsAuthenticatedState(true)
-    // 认证成功后刷新页面以跳转到主界面
     window.location.href = '/'
   }
 
@@ -50,67 +50,57 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
     setCurrentUser(null)
   }
 
+  // Loading state
   if (isAuthenticatedState === null) {
-    // 加载状态
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="landing-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-          <p className="mt-4 text-slate-600 dark:text-slate-400">加载中...</p>
+          <p className="mt-4 text-slate-400">{t('app.loading')}</p>
         </div>
       </div>
     )
   }
 
+  // Unauthenticated — show landing page
   if (!isAuthenticatedState) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
-        <div className="max-w-md w-full text-center">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-700">
-            <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <User className="w-8 h-8 text-primary-500" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-              欢迎使用 Gestalt
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400 mb-8">
-              请先登录或注册以开始使用提示词编译器
-            </p>
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => setShowAuthModal(true)}
-              className="w-full py-3"
-            >
-              开始使用
-            </Button>
-          </div>
-        </div>
-        
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onAuthSuccess={handleAuthSuccess}
-        />
-      </div>
-    )
+    return <LandingPage onAuthSuccess={handleAuthSuccess} />
   }
 
-  // 已认证用户，显示主要内容
+  // Authenticated user — main app
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      {/* 顶部导航栏 */}
-      <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40">
+    <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-br from-[#F0F4FF] to-white dark:from-[#0F172A] dark:to-[#0F172A]">
+      {/* Top nav */}
+      <nav className="flex-none bg-white/70 dark:bg-[#0F172A]/80 backdrop-blur-xl border-b border-gray-100 dark:border-slate-700/50 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-                Gestalt Prompt Compiler
+              <h1 className="text-lg font-bold text-gray-800 dark:text-white">
+                Gestalt Prompt Compiler——提示词编译器
               </h1>
             </div>
             
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+            <div className="flex items-center gap-2">
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-xl text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                title={theme === 'dark' ? t('theme.light') : t('theme.dark')}
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+
+              {/* Language toggle */}
+              <button
+                onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
+                className="px-2.5 py-1.5 rounded-xl text-xs font-medium text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors border border-gray-200 dark:border-slate-700"
+              >
+                {locale === 'zh' ? 'EN' : '中文'}
+              </button>
+
+              <div className="w-px h-5 bg-gray-200 dark:bg-slate-700 mx-1" />
+
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
                 <User className="w-4 h-4" />
                 <span>{currentUser?.name || currentUser?.email}</span>
               </div>
@@ -121,14 +111,14 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
                 className="flex items-center gap-1"
               >
                 <LogOut className="w-4 h-4" />
-                登出
+                {t('app.logout')}
               </Button>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="pb-8">
+      <main className="flex-1 min-h-0">
         {children}
       </main>
     </div>

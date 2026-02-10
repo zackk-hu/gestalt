@@ -13,7 +13,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700',
+          'bg-white dark:bg-slate-800 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/20 border border-gray-100 dark:border-slate-700/50',
           hover && 'transition-all duration-300 hover:shadow-xl hover:-translate-y-1',
           className
         )}
@@ -33,7 +33,7 @@ interface CardHeaderProps {
 
 export function CardHeader({ className, children }: CardHeaderProps) {
   return (
-    <div className={cn('px-6 py-4 border-b border-slate-200 dark:border-slate-700', className)}>
+    <div className={cn('px-6 py-4 border-b border-gray-100 dark:border-slate-700/50', className)}>
       {children}
     </div>
   )
@@ -59,7 +59,7 @@ interface CardFooterProps {
 
 export function CardFooter({ className, children }: CardFooterProps) {
   return (
-    <div className={cn('px-6 py-4 border-t border-slate-200 dark:border-slate-700', className)}>
+    <div className={cn('px-6 py-4 border-t border-gray-100 dark:border-slate-700/50', className)}>
       {children}
     </div>
   )

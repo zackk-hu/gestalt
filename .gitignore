@@ -32,6 +32,9 @@ yarn-error.log*
 # Vercel
 .vercel
 
+# Nested project copy
+Gestalt/
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts

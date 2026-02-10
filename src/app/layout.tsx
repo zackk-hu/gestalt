@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
+import { Providers } from '@/components/Providers'
 
 export const metadata: Metadata = {
-  title: 'Gestalt — AI提示词编译器',
-  description: '将原始意图转换为专业级 Prompt，基于 Meta-Prompting、CoT 思维链与智能推理模式切换技术',
-  keywords: ['Gestalt', 'AI', 'Prompt', '提示词编译器', 'Meta-Prompting', 'CoT', 'LLM'],
+  title: 'Gestalt — AI Prompt Compiler',
+  description: 'Transform raw intent into professional-grade prompts with Meta-Prompting, CoT and intelligent reasoning mode switching',
+  keywords: ['Gestalt', 'AI', 'Prompt', 'Prompt Compiler', 'Meta-Prompting', 'CoT', 'LLM'],
 }
 
 export default function RootLayout({
@@ -14,11 +15,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <ProtectedLayout>
-          {children}
-        </ProtectedLayout>
+        <Providers>
+          <ProtectedLayout>
+            {children}
+          </ProtectedLayout>
+        </Providers>
       </body>
     </html>
   )

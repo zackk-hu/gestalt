@@ -1,4 +1,4 @@
-﻿﻿'use client'
+﻿'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
 import { Send, Trash2, User, Bot, Loader2, Pencil, Check, X, Zap, Brain, GitBranch, FileText, Image as ImageIcon, Video, Paperclip, File, XCircle, RotateCcw } from 'lucide-react'
@@ -7,6 +7,7 @@ import { Message, ApiConfig, generateId, PromptType, TASK_TYPE_OPTIONS } from '@
 import { extractPromptFromResponse, extractReasoningMode, EXAMPLE_QUESTIONS } from '@/lib/prompts'
 import { cn } from '@/lib/utils'
 import { ClarificationRequest } from '@/lib/rag/types'
+import { useI18n } from '@/lib/i18n'
 
 interface ChatPanelProps {
   config: ApiConfig
@@ -52,6 +53,7 @@ function ReasoningModeTag({ mode, complexity }: { mode: string; complexity: stri
 }
 
 export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
+  const { t } = useI18n()
   // 按任务类型分开存储消息历史
   const [messagesByType, setMessagesByType] = useState<Record<PromptType, Message[]>>({
     [PromptType.TEXT]: [],
@@ -228,7 +230,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         const errorMessage: Message = {
           id: generateId(),
           role: 'assistant',
-          content: `抱歉，发生了错误：${data.error || '未知错误'}`,
+          content: `${t('chat.error')}${data.error || t('chat.unknownError')}`,
           timestamp: Date.now()
         }
         setMessages(prev => [...prev, errorMessage])
@@ -237,7 +239,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
       const errorMessage: Message = {
         id: generateId(),
         role: 'assistant',
-        content: '网络错误，请检查连接后重试',
+        content: t('chat.networkError'),
         timestamp: Date.now()
       }
       setMessages(prev => [...prev, errorMessage])
@@ -255,7 +257,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     let messageContent = input.trim()
     if (attachments.length > 0) {
       const attachmentInfo = attachments.map(att => 
-        `[附件: ${att.name} (${att.type === 'image' ? '图片' : att.type === 'document' ? '文档' : '文件'}, ${formatFileSize(att.size)})]`
+        `[${t('chat.attachment')}: ${att.name} (${att.type === 'image' ? t('chat.image') : att.type === 'document' ? t('chat.document') : t('chat.file')}, ${formatFileSize(att.size)})]`
       ).join('\n')
       messageContent = messageContent 
         ? `${messageContent}\n\n---\n${attachmentInfo}`
@@ -369,7 +371,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     const userChoiceMessage: Message = {
       id: generateId(),
       role: 'user',
-      content: `选择: ${optionId}`,
+      content: `${t('chat.select')}: ${optionId}`,
       timestamp: Date.now()
     };
     
@@ -396,12 +398,12 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
   };
 
   return (
-    <div className="flex flex-col h-[600px] bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden" style={{ minHeight: 0 }}>
+    <div className="flex flex-col h-full bg-white dark:bg-slate-800 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/20 border border-gray-100 dark:border-slate-700/50 overflow-hidden" style={{ minHeight: 0 }}>
       {/* 头部 (Fixed) */}
-      <div className="flex-none flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary-500/10 to-accent-500/10 z-10">
+      <div className="flex-none flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-slate-700/50 bg-gradient-to-r from-primary-500/5 to-accent-500/5 dark:from-primary-500/10 dark:to-accent-500/10 z-10">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-            提示词编译车间
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+            {t('chat.title')}
           </h2>
           {lastReasoningMode && (
             <ReasoningModeTag 
@@ -412,53 +414,56 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         </div>
         <Button variant="ghost" size="sm" onClick={handleClear}>
           <Trash2 className="w-4 h-4 mr-1" />
-          清空
+          {t('chat.clear')}
         </Button>
       </div>
 
       {/* 任务类型选择器 (Fixed) */}
-      <div className="flex-none px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 z-10">
+      <div className="flex-none px-4 py-2 border-b border-gray-100 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800/50 z-10">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 dark:text-slate-400">任务类型：</span>
+          <span className="text-xs text-gray-400 dark:text-slate-500">{t('chat.taskType')}</span>
           <div className="flex gap-1">
-            {TASK_TYPE_OPTIONS.map((option) => (
+            {TASK_TYPE_OPTIONS.map((option) => {
+              const nameKey = option.type === PromptType.TEXT ? 'type.text' : option.type === PromptType.IMAGE ? 'type.image' : 'type.video'
+              const descKey = option.type === PromptType.TEXT ? 'type.textDesc' : option.type === PromptType.IMAGE ? 'type.imageDesc' : 'type.videoDesc'
+              return (
               <button
                 key={option.type}
                 onClick={() => setTaskType(option.type)}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                   taskType === option.type
-                    ? 'bg-primary-500 text-white shadow-sm'
-                    : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600'
+                    ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-sm shadow-primary-500/20'
+                    : 'bg-white dark:bg-slate-700 text-gray-500 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600'
                 )}
-                title={option.description}
+                title={t(descKey as any)}
               >
                 <span>{option.icon}</span>
-                <span>{option.name}</span>
+                <span>{t(nameKey as any)}</span>
               </button>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
     
       {/* 消息列表 (Flexible & Scrollable) */}
-      {/* 关键修改：flex-1 overflow-y-auto min-h-0 确保只在这个区域内滚动 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-slate-900 scroll-smooth" style={{ minHeight: 0 }}>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-slate-800 scroll-smooth" style={{ minHeight: 0 }}>
         {messages.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-slate-400 dark:text-slate-500 mb-4">
+            <div className="text-gray-400 dark:text-slate-500 mb-4">
               <Bot className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>开始对话，描述你想要的{
-                taskType === PromptType.TEXT ? '提示词' : 
-                taskType === PromptType.IMAGE ? '图片效果' : 
-                '视频效果'
+              <p>{t('chat.startChat')}{
+                taskType === PromptType.TEXT ? t('chat.promptSuffix') : 
+                taskType === PromptType.IMAGE ? t('chat.imageEffect') : 
+                t('chat.videoEffect')
               }</p>
               <p className="text-sm mt-1">
                 {taskType === PromptType.TEXT 
-                  ? '系统会自动判断任务复杂度，智能切换推理模式，支持 RAG 知识增强'
+                  ? t('chat.textAutoDesc')
                   : taskType === PromptType.IMAGE
-                  ? '系统会用"导演视角"结构化你的创意，支持风格参考检索'
-                  : '系统会生成专业的分镜脚本和运镜指令，支持影片风格参考'}
+                  ? t('chat.imageAutoDesc')
+                  : t('chat.videoAutoDesc')}
               </p>
             </div>
             
@@ -467,15 +472,15 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
               <div className="flex flex-wrap justify-center gap-2 mb-4">
                 <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs">
                   <Zap className="w-3 h-3" />
-                  直觉式 · 简单任务
+                  {t('chat.intuition')}
                 </div>
                 <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs">
                   <Brain className="w-3 h-3" />
-                  思维链 · 中等任务
+                  {t('chat.cot')}
                 </div>
                 <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs">
                   <GitBranch className="w-3 h-3" />
-                  思维树 · 复杂任务
+                  {t('chat.tot')}
                 </div>
               </div>
             )}
@@ -521,7 +526,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                 <button
                   key={index}
                   onClick={() => handleExampleClick(example)}
-                  className="px-3 py-1.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  className="px-3 py-1.5 text-xs rounded-full bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                 >
                   {example}
                 </button>
@@ -540,8 +545,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
               <div className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
                 message.role === 'user' 
-                  ? 'bg-primary-500 text-white' 
-                  : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                  ? 'bg-gradient-to-br from-primary-500 to-accent-500 text-white shadow-sm shadow-primary-500/20' 
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-300'
               )}>
                 {message.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
               </div>
@@ -559,14 +564,14 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                       value={editingContent}
                       onChange={(e) => setEditingContent(e.target.value)}
                       onKeyDown={(e) => handleEditKeyDown(e, message.id)}
-                      className="w-full px-3 py-2 rounded-xl border-2 border-primary-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none resize-none text-sm"
+                      className="w-full px-3 py-2 rounded-xl border-2 border-primary-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white focus:outline-none resize-none text-sm"
                       rows={Math.min(8, editingContent.split('\n').length + 1)}
                     />
                     <div className="flex justify-end gap-2 mt-2">
                       <button
                         onClick={handleCancelEdit}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition-colors"
-                        title="取消 (Esc)"
+                        className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-400 transition-colors"
+                        title={t('chat.cancelEsc')}
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -574,7 +579,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                         onClick={() => handleConfirmEdit(message.id)}
                         disabled={!editingContent.trim() || isLoading}
                         className="p-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white disabled:opacity-50 transition-colors"
-                        title="确认并重新发送 (Enter)"
+                        title={t('chat.confirmResend')}
                       >
                         <Check className="w-4 h-4" />
                       </button>
@@ -586,8 +591,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                     <div className={cn(
                       'px-4 py-2 rounded-2xl',
                       message.role === 'user'
-                        ? 'bg-primary-500 text-white rounded-tr-sm'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-tl-sm'
+                        ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-tr-sm shadow-sm shadow-primary-500/20'
+                        : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-100 rounded-tl-sm'
                     )}>
                       <div className="whitespace-pre-wrap text-sm">
                         {message.content}
@@ -598,8 +603,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                     {message.role === 'user' && !isLoading && (
                       <button
                         onClick={() => handleStartEdit(message)}
-                        className="mt-1 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all"
-                        title="编辑此消息"
+                        className="mt-1 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-all"
+                        title={t('chat.editMessage')}
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
@@ -613,13 +618,13 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-700">
-              <Bot className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 dark:bg-slate-700">
+              <Bot className="w-4 h-4 text-gray-500 dark:text-slate-300" />
             </div>
-            <div className="px-4 py-2 rounded-2xl rounded-tl-sm bg-slate-100 dark:bg-slate-800">
+            <div className="px-4 py-2 rounded-2xl rounded-tl-sm bg-gray-100 dark:bg-slate-700">
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-primary-500" />
-                <span className="text-xs text-slate-500">分析任务复杂度...</span>
+                <span className="text-xs text-gray-400 dark:text-slate-400">{t('chat.analyzing')}</span>
               </div>
             </div>
           </div>
@@ -627,7 +632,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
         
         {/* 澄清请求组件 */}
         {clarificationRequest && (
-          <div className="mb-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <div className="mb-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/50">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-blue-500 text-white">
                 <Bot className="w-4 h-4" />
@@ -651,13 +656,13 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                   ))}
                 </div>
                 <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
-                  请选择一个选项继续...
+                  {t('chat.selectOption')}
                 </div>
               </div>
               <button
                 onClick={handleRetryClarification}
                 className="p-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 text-blue-500 dark:text-blue-400"
-                title="重新生成"
+                title={t('chat.regenerate')}
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -669,15 +674,14 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
       </div>
     
       {/* 输入区域 (Fixed at bottom) */}
-      {/* 关键修改：flex-none 防止被压缩，z-10 提升层级，bg-white 防止背景透明 */}
-      <div className="flex-none border-t border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-3 bg-white dark:bg-slate-900 z-10">
+      <div className="flex-none border-t border-gray-100 dark:border-slate-700/50 p-4 flex flex-col gap-3 bg-white dark:bg-slate-800 z-10">
         {/* 附件预览列表 */}
         {attachments.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {attachments.map(att => (
               <div 
                 key={att.id}
-                className="relative group flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+                className="relative group flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600"
               >
                 {att.type === 'image' && att.preview ? (
                   <img 
@@ -686,28 +690,28 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                     className="w-10 h-10 object-cover rounded"
                   />
                 ) : (
-                  <div className="w-10 h-10 flex items-center justify-center bg-slate-200 dark:bg-slate-700 rounded">
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-slate-600 rounded">
                     {att.type === 'image' ? (
-                      <ImageIcon className="w-5 h-5 text-slate-500" />
+                      <ImageIcon className="w-5 h-5 text-gray-400" />
                     ) : att.type === 'document' ? (
-                      <FileText className="w-5 h-5 text-slate-500" />
+                      <FileText className="w-5 h-5 text-gray-400" />
                     ) : (
-                      <File className="w-5 h-5 text-slate-500" />
+                      <File className="w-5 h-5 text-gray-400" />
                     )}
                   </div>
                 )}
                 <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate max-w-[120px]">
+                  <span className="text-xs font-medium text-gray-600 dark:text-slate-300 truncate max-w-[120px]">
                     {att.name}
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-gray-400">
                     {formatFileSize(att.size)}
                   </span>
                 </div>
                 <button
                   onClick={() => removeAttachment(att.id)}
                   className="absolute -top-1.5 -right-1.5 p-0.5 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                  title="移除附件"
+                  title={t('chat.removeAttachment')}
                 >
                   <XCircle className="w-4 h-4" />
                 </button>
@@ -715,7 +719,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
             ))}
             {attachments.length >= MAX_FILES && (
               <div className="flex items-center px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
-                已达到最大文件数量 ({MAX_FILES})
+                {t('chat.maxFiles')} ({MAX_FILES})
               </div>
             )}
           </div>
@@ -738,7 +742,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
             onClick={triggerFileSelect}
             disabled={isLoading || attachments.length >= MAX_FILES}
             className="self-end"
-            title={`上传文件 (${attachments.length}/${MAX_FILES})`}
+            title={`${t('chat.uploadFile')} (${attachments.length}/${MAX_FILES})`}
           >
             <Paperclip className="w-4 h-4" />
           </Button>
@@ -747,8 +751,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="描述你想要的提示词... (Enter 发送，Shift+Enter 换行)"
-            className="flex-1 px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+            placeholder={t('chat.inputPlaceholder')}
+            className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             rows={2}
             disabled={isLoading}
           />
@@ -761,8 +765,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-xs text-slate-400">
-          悬停消息可编辑 · 支持上传图片/文档 (最多{MAX_FILES}个) · 当前模式：{TASK_TYPE_OPTIONS.find(o => o.type === taskType)?.name}
+        <p className="text-xs text-gray-400 dark:text-slate-500">
+          {t('chat.inputHint')} ({t('chat.currentMode')}{TASK_TYPE_OPTIONS.find(o => o.type === taskType)?.name})
         </p>
       </div>
     </div>
