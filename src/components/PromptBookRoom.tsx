@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { BookOpen, Star, ExternalLink, Sparkles, Lightbulb, Wrench, Book } from 'lucide-react'
+import { BookOpen, Star, ExternalLink, Sparkles, Lightbulb, Wrench, Book, Brain, Code2, GraduationCap, Cpu, MessageSquare, Layers, Workflow, FileCode2, Boxes, Network, Zap, Pen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface BookInfo {
@@ -155,12 +155,62 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
-// AlphaTrend 风格的 Unsplash 通用书籍封面回退图片
-const FALLBACK_COVER = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200&h=280&fit=crop'
+// ── 分类别 Unsplash 回退图片（第二级） ──
+const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
+  '推荐精选': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200&h=280&fit=crop',
+  '实战技巧': 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=200&h=280&fit=crop',
+  '工具与理论': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=280&fit=crop',
+}
+
+// ── 每本书独立的图标与渐变色配置（第三级） ──
+const BOOK_PLACEHOLDER_STYLES: { icon: React.ElementType; gradient: string; iconColor: string }[] = [
+  { icon: Brain,          gradient: 'from-rose-200 to-pink-100 dark:from-rose-900/40 dark:to-pink-900/30',       iconColor: 'text-rose-500 dark:text-rose-400' },
+  { icon: MessageSquare,  gradient: 'from-sky-200 to-blue-100 dark:from-sky-900/40 dark:to-blue-900/30',         iconColor: 'text-sky-500 dark:text-sky-400' },
+  { icon: Code2,          gradient: 'from-emerald-200 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/30', iconColor: 'text-emerald-500 dark:text-emerald-400' },
+  { icon: Layers,         gradient: 'from-amber-200 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/30', iconColor: 'text-amber-500 dark:text-amber-400' },
+  { icon: Zap,            gradient: 'from-violet-200 to-purple-100 dark:from-violet-900/40 dark:to-purple-900/30', iconColor: 'text-violet-500 dark:text-violet-400' },
+  { icon: Workflow,       gradient: 'from-cyan-200 to-teal-100 dark:from-cyan-900/40 dark:to-teal-900/30',       iconColor: 'text-cyan-500 dark:text-cyan-400' },
+  { icon: Cpu,            gradient: 'from-indigo-200 to-blue-100 dark:from-indigo-900/40 dark:to-blue-900/30',   iconColor: 'text-indigo-500 dark:text-indigo-400' },
+  { icon: FileCode2,      gradient: 'from-orange-200 to-red-100 dark:from-orange-900/40 dark:to-red-900/30',     iconColor: 'text-orange-500 dark:text-orange-400' },
+  { icon: Network,        gradient: 'from-fuchsia-200 to-pink-100 dark:from-fuchsia-900/40 dark:to-pink-900/30', iconColor: 'text-fuchsia-500 dark:text-fuchsia-400' },
+  { icon: GraduationCap,  gradient: 'from-lime-200 to-green-100 dark:from-lime-900/40 dark:to-green-900/30',     iconColor: 'text-lime-600 dark:text-lime-400' },
+  { icon: Boxes,          gradient: 'from-blue-200 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/30',   iconColor: 'text-blue-500 dark:text-blue-400' },
+  { icon: Pen,            gradient: 'from-teal-200 to-emerald-100 dark:from-teal-900/40 dark:to-emerald-900/30', iconColor: 'text-teal-500 dark:text-teal-400' },
+]
+
+// 类别对应的徽标渐变
+const CATEGORY_BADGE: Record<string, string> = {
+  '推荐精选': 'from-amber-500 to-orange-500',
+  '实战技巧': 'from-emerald-500 to-teal-500',
+  '工具与理论': 'from-violet-500 to-indigo-500',
+}
+
+/** 个性化占位符：每本书有独特的图标、颜色和首字母标识 */
+function BookPlaceholder({ book, globalIndex }: { book: BookInfo; globalIndex: number }) {
+  const style = BOOK_PLACEHOLDER_STYLES[globalIndex % BOOK_PLACEHOLDER_STYLES.length]
+  const Icon = style.icon
+  const initial = book.title.charAt(0).toUpperCase()
+  const badgeGradient = CATEGORY_BADGE[book.category] || 'from-gray-500 to-gray-600'
+
+  return (
+    <div className={cn('flex flex-col items-center justify-center h-full p-3 bg-gradient-to-br', style.gradient)}>
+      {/* 首字母圆形徽章 */}
+      <div className={cn('w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-2 shadow-lg', badgeGradient)}>
+        <span className="text-xl font-bold text-white drop-shadow">{initial}</span>
+      </div>
+      {/* 类别专属图标 */}
+      <Icon className={cn('w-5 h-5 mb-1.5', style.iconColor)} strokeWidth={1.5} />
+      {/* 书名摘要 */}
+      <span className="text-[10px] text-center px-2 font-medium text-gray-600 dark:text-slate-300 line-clamp-2 leading-tight">
+        {book.title.length > 35 ? book.title.slice(0, 35) + '…' : book.title}
+      </span>
+    </div>
+  )
+}
 
 export function PromptBookRoom() {
   const [activeCategory, setActiveCategory] = useState<string>('推荐精选')
-  // 0 = 原始URL, 1 = Unsplash回退, 2+ = 显示图标
+  // 0 = 原始URL, 1 = Unsplash回退, 2+ = 个性化占位符
   const [imageErrors, setImageErrors] = useState<Record<string, number>>({})
 
   const filteredBooks = BOOKS.filter(b => b.category === activeCategory)
@@ -171,6 +221,9 @@ export function PromptBookRoom() {
       [bookTitle]: (prev[bookTitle] || 0) + 1
     }))
   }
+
+  // 获取书籍在全局列表中的索引（用于分配唯一占位符样式）
+  const getGlobalIndex = (title: string) => BOOKS.findIndex(b => b.title === title)
 
   return (
     <section className="py-10 px-4">
@@ -220,16 +273,17 @@ export function PromptBookRoom() {
               className="group bg-white dark:bg-slate-800/80 rounded-2xl border border-gray-100 dark:border-slate-700/50 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1"
               style={{ animationDelay: `${idx * 80}ms` }}
             >
-              {/* Cover - 两级回退: Open Library → Unsplash → 图标 */}
+              {/* Cover - 三级回退: Open Library → 分类别 Unsplash → 个性化占位符 */}
               <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center overflow-hidden">
                 {(imageErrors[book.title] || 0) >= 2 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-slate-500">
-                    <Book className="w-12 h-12 mb-2" strokeWidth={1.5} />
-                    <span className="text-xs text-center px-2">{book.title.slice(0, 30)}</span>
-                  </div>
+                  <BookPlaceholder book={book} globalIndex={getGlobalIndex(book.title)} />
                 ) : (
                   <img
-                    src={(imageErrors[book.title] || 0) === 0 ? book.coverUrl : FALLBACK_COVER}
+                    src={
+                      (imageErrors[book.title] || 0) === 0
+                        ? book.coverUrl
+                        : CATEGORY_FALLBACK_IMAGES[book.category] || CATEGORY_FALLBACK_IMAGES['推荐精选']
+                    }
                     alt={book.title}
                     referrerPolicy="no-referrer"
                     crossOrigin="anonymous"
