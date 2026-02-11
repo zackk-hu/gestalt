@@ -254,8 +254,8 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
             <div className="animate-float relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/hero-3d.png"
-                alt="Gestalt 3D visualization"
+                src="/images/hero-gestalt.jpg"
+                alt="Gestalt Prompt Compiler"
                 className="w-full max-w-lg rounded-2xl"
                 style={{ filter: 'drop-shadow(0 0 60px rgba(99, 102, 241, 0.2))' }}
               />
