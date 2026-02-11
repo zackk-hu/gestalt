@@ -20,7 +20,7 @@ const BOOKS: BookInfo[] = [
     title: 'Prompt Engineering for Generative AI',
     author: 'James Phoenix & Mike Taylor',
     description: 'O\'Reilly 出品，系统讲解面向 LLM/Diffusion 模型的提示词设计方法论与最佳实践。',
-    coverUrl: 'https://m.media-amazon.com/images/I/71dKDM4CbaL._SL1500_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781098153427-L.jpg',
     category: '推荐精选',
     rating: 4.5,
     link: 'https://www.oreilly.com/library/view/prompt-engineering-for/9781098153427/',
@@ -29,7 +29,7 @@ const BOOKS: BookInfo[] = [
     title: 'The Art of Prompt Engineering with ChatGPT',
     author: 'Nathan Hunter',
     description: '从零到一掌握 ChatGPT 提示词工程，涵盖角色扮演、链式思维、少样本提示等核心技巧。',
-    coverUrl: 'https://m.media-amazon.com/images/I/71YaSoVJHBL._SL1500_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781835082706-L.jpg',
     category: '推荐精选',
     rating: 4.3,
     link: 'https://www.amazon.com/dp/B0C2JBZQLS',
@@ -38,7 +38,7 @@ const BOOKS: BookInfo[] = [
     title: 'ChatGPT Prompt Engineering for Developers',
     author: 'Andrew Ng & Isa Fulford',
     description: 'DeepLearning.AI 联合 OpenAI 推出的开发者向提示词工程课程配套读物，聚焦 API 级实践。',
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1682492178i/123204386.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781835083963-L.jpg',
     category: '推荐精选',
     rating: 4.7,
     link: 'https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/',
@@ -47,7 +47,7 @@ const BOOKS: BookInfo[] = [
     title: 'Build a Large Language Model (From Scratch)',
     author: 'Sebastian Raschka',
     description: 'Manning 出品，从底层理解 LLM 运作原理，帮助提示词工程师深入模型内核做出更好的 Prompt。',
-    coverUrl: 'https://m.media-amazon.com/images/I/71I3KFnGEDL._SL1500_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781633437166-L.jpg',
     category: '推荐精选',
     rating: 4.8,
     link: 'https://www.manning.com/books/build-a-large-language-model-from-scratch',
@@ -57,7 +57,7 @@ const BOOKS: BookInfo[] = [
     title: 'The Art of Asking ChatGPT for High-Quality Answers',
     author: 'Ibrahim John',
     description: '高质量提问的艺术：通过实例讲解如何向 ChatGPT 提出精准问题获得最佳输出。',
-    coverUrl: 'https://m.media-amazon.com/images/I/61v4pCQhJoL._SL1499_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9798371539250-L.jpg',
     category: '实战技巧',
     rating: 4.2,
     link: 'https://www.amazon.com/dp/B0BT2JM737',
@@ -66,7 +66,7 @@ const BOOKS: BookInfo[] = [
     title: 'AI-Powered Developer',
     author: 'Nathan B. Crocker',
     description: 'Manning 出品，面向开发者的 AI 辅助开发指南，提示词工程在软件开发中的深度实践。',
-    coverUrl: 'https://m.media-amazon.com/images/I/71IEd+u4hQL._SL1500_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781633436558-L.jpg',
     category: '实战技巧',
     rating: 4.4,
     link: 'https://www.manning.com/books/ai-powered-developer',
@@ -75,7 +75,7 @@ const BOOKS: BookInfo[] = [
     title: 'Prompt Engineering for ChatGPT',
     author: 'Jules White (Vanderbilt)',
     description: 'Coursera 热门课程教材，Vanderbilt 大学出品，从模式库到自动化 Prompt 管线。',
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1697652860i/198747143.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781098156749-L.jpg',
     category: '实战技巧',
     rating: 4.5,
     link: 'https://www.coursera.org/learn/prompt-engineering',
@@ -84,7 +84,7 @@ const BOOKS: BookInfo[] = [
     title: 'Designing Large Language Model Applications',
     author: 'Suhas Pai',
     description: 'O\'Reilly 出品，专注 LLM 应用设计与提示词优化，含 RAG、Agent 等前沿实战模式。',
-    coverUrl: 'https://m.media-amazon.com/images/I/71cEqV3GKLL._SL1500_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781098150488-L.jpg',
     category: '实战技巧',
     rating: 4.6,
     link: 'https://www.oreilly.com/library/view/designing-large-language/9781098150488/',
@@ -94,7 +94,7 @@ const BOOKS: BookInfo[] = [
     title: 'Prompt Engineering for LLMs',
     author: 'John Berryman & Albert Ziegler',
     description: 'O\'Reilly 出品，深入 LLM 提示词工程的原理、模式与高级技巧，行业标杆级参考书。',
-    coverUrl: 'https://m.media-amazon.com/images/I/71BW64yKTxL._SL1500_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781098153137-L.jpg',
     category: '工具与理论',
     rating: 4.6,
     link: 'https://www.oreilly.com/library/view/prompt-engineering-for/9781098153137/',
@@ -103,7 +103,7 @@ const BOOKS: BookInfo[] = [
     title: 'Natural Language Processing with Transformers',
     author: 'Lewis Tunstall, Leandro von Werra & Thomas Wolf',
     description: 'O\'Reilly + Hugging Face 团队合著，Transformer 架构与 NLP 理论基础，提示词设计的理论根基。',
-    coverUrl: 'https://m.media-amazon.com/images/I/61IKfVuBC4L._SL1360_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781098136796-L.jpg',
     category: '工具与理论',
     rating: 4.7,
     link: 'https://www.oreilly.com/library/view/natural-language-processing/9781098136789/',
@@ -112,7 +112,7 @@ const BOOKS: BookInfo[] = [
     title: 'Generative Deep Learning (2nd Ed.)',
     author: 'David Foster',
     description: 'O\'Reilly 经典，涵盖 VAE、GAN、GPT 等生成模型原理，为高级提示词设计提供理论支撑。',
-    coverUrl: 'https://m.media-amazon.com/images/I/71Dp5MbJGEL._SL1500_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781098134181-L.jpg',
     category: '工具与理论',
     rating: 4.5,
     link: 'https://www.oreilly.com/library/view/generative-deep-learning/9781098134174/',
@@ -121,7 +121,7 @@ const BOOKS: BookInfo[] = [
     title: 'AI Engineering',
     author: 'Chip Huyen',
     description: 'O\'Reilly 出品，涵盖 AI 工程全流程，提示词编排、评估流水线与生产级 LLM 应用架构。',
-    coverUrl: 'https://m.media-amazon.com/images/I/71x5q+pX+hL._SL1500_.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781098166304-L.jpg',
     category: '工具与理论',
     rating: 4.8,
     link: 'https://www.oreilly.com/library/view/ai-engineering/9781098166298/',
@@ -155,14 +155,21 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
+// AlphaTrend 风格的 Unsplash 通用书籍封面回退图片
+const FALLBACK_COVER = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200&h=280&fit=crop'
+
 export function PromptBookRoom() {
   const [activeCategory, setActiveCategory] = useState<string>('推荐精选')
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
+  // 0 = 原始URL, 1 = Unsplash回退, 2+ = 显示图标
+  const [imageErrors, setImageErrors] = useState<Record<string, number>>({})
 
   const filteredBooks = BOOKS.filter(b => b.category === activeCategory)
 
   const handleImageError = (bookTitle: string) => {
-    setImageErrors(prev => ({ ...prev, [bookTitle]: true }))
+    setImageErrors(prev => ({
+      ...prev,
+      [bookTitle]: (prev[bookTitle] || 0) + 1
+    }))
   }
 
   return (
@@ -213,17 +220,19 @@ export function PromptBookRoom() {
               className="group bg-white dark:bg-slate-800/80 rounded-2xl border border-gray-100 dark:border-slate-700/50 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1"
               style={{ animationDelay: `${idx * 80}ms` }}
             >
-              {/* Cover */}
+              {/* Cover - 两级回退: Open Library → Unsplash → 图标 */}
               <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center overflow-hidden">
-                {imageErrors[book.title] ? (
+                {(imageErrors[book.title] || 0) >= 2 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-slate-500">
                     <Book className="w-12 h-12 mb-2" strokeWidth={1.5} />
                     <span className="text-xs text-center px-2">{book.title.slice(0, 30)}</span>
                   </div>
                 ) : (
                   <img
-                    src={book.coverUrl}
+                    src={(imageErrors[book.title] || 0) === 0 ? book.coverUrl : FALLBACK_COVER}
                     alt={book.title}
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     className="h-40 w-auto object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
                     onError={() => handleImageError(book.title)}
                     loading="lazy"
