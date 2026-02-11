@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { ConfigPanel } from '@/components/ConfigPanel'
 import { ChatPanel } from '@/components/ChatPanel'
 import { TestPanel } from '@/components/TestPanel'
-import { PromptBookRoom } from '@/components/PromptBookRoom'
 import { PromptEvaluationPanel } from '@/components/PromptEvaluationPanel'
 import { ApiConfig, DEFAULT_CONFIG } from '@/lib/types'
 
@@ -74,14 +73,6 @@ export default function Home() {
 
       {/* 提示词优化评价 */}
       <PromptEvaluationPanel />
-
-      {/* 分隔线 */}
-      <div className="max-w-7xl mx-auto w-full px-4">
-        <div className="border-t border-gray-200 dark:border-slate-700/50" />
-      </div>
-
-      {/* AI 书房 */}
-      <PromptBookRoom />
     </main>
   )
 }

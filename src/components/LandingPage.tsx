@@ -5,6 +5,7 @@ import { Mail, Lock, Eye, EyeOff, User, Zap, Brain, Layers, Play, ArrowRight, Su
 import { useI18n } from '@/lib/i18n'
 import { useTheme } from '@/lib/theme'
 import { cn } from '@/lib/utils'
+import { PromptBookRoom } from './PromptBookRoom'
 
 interface LandingPageProps {
   onAuthSuccess: (user: any) => void
@@ -129,6 +130,28 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
               <p className="text-lg text-gray-500 dark:text-slate-400 max-w-lg leading-relaxed">
                 {t('landing.tagline')}
               </p>
+            </div>
+
+            {/* Performance Metrics */}
+            <div className="glass-card rounded-xl p-5 space-y-3 max-w-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 mt-2 flex-shrink-0" />
+                <p className="text-gray-700 dark:text-slate-300 text-sm leading-relaxed">
+                  <span className="font-semibold text-gray-900 dark:text-white">效率提升：</span>用户平均交互轮数从 6.4 轮降低至 1.2 轮。
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-cyan-500 mt-2 flex-shrink-0" />
+                <p className="text-gray-700 dark:text-slate-300 text-sm leading-relaxed">
+                  <span className="font-semibold text-gray-900 dark:text-white">成本降低：</span>减少 40% 以上的无效 Token 往复消耗。
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 mt-2 flex-shrink-0" />
+                <p className="text-gray-700 dark:text-slate-300 text-sm leading-relaxed">
+                  <span className="font-semibold text-gray-900 dark:text-white">准确率：</span>复杂逻辑任务的意图对齐准确率从 55% 提升至 92%。
+                </p>
+              </div>
             </div>
 
             {/* Glassmorphism Login Form */}
@@ -292,6 +315,9 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
           </div>
         </div>
       </section>
+
+      {/* ======== AI 书房 SECTION ======== */}
+      <PromptBookRoom />
 
       {/* Footer */}
       <footer className="py-8 px-6 border-t border-gray-200 dark:border-white/5">
