@@ -38,7 +38,7 @@ const BOOKS: BookInfo[] = [
     title: 'Developing Apps with GPT-4 and ChatGPT',
     author: 'Olivier Caelen & Marie-Alice Blete',
     description: 'O\'Reilly 出品，从 API 调用到应用落地，系统讲解基于 GPT-4/ChatGPT 构建智能应用的全流程实践。',
-    coverUrl: 'https://covers.openlibrary.org/b/isbn/9781098152482-L.jpg',
+    coverUrl: 'https://m.media-amazon.com/images/I/71wvKXWfcML._AC_UF1000,1000_QL80_.jpg',
     category: '推荐精选',
     rating: 4.5,
     link: 'https://www.oreilly.com/library/view/developing-apps-with/9781098152475/',
