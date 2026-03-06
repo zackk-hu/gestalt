@@ -59,6 +59,7 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     [PromptType.TEXT]: [],
     [PromptType.IMAGE]: [],
     [PromptType.VIDEO]: [],
+    [PromptType.AUDIO]: [],
   })
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -92,9 +93,14 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // only scroll when new message appended (not when switching taskType)
+  const prevMsgCount = useRef(messages.length)
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    if (messages.length > prevMsgCount.current) {
+      scrollToBottom()
+    }
+    prevMsgCount.current = messages.length
+  }, [messages.length])
 
   // 聚焦编辑框
   useEffect(() => {
@@ -424,8 +430,8 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
           <span className="text-xs text-gray-400 dark:text-slate-500">{t('chat.taskType')}</span>
           <div className="flex gap-1">
             {TASK_TYPE_OPTIONS.map((option) => {
-              const nameKey = option.type === PromptType.TEXT ? 'type.text' : option.type === PromptType.IMAGE ? 'type.image' : 'type.video'
-              const descKey = option.type === PromptType.TEXT ? 'type.textDesc' : option.type === PromptType.IMAGE ? 'type.imageDesc' : 'type.videoDesc'
+              const nameKey = option.type === PromptType.TEXT ? 'type.text' : option.type === PromptType.IMAGE ? 'type.image' : option.type === PromptType.VIDEO ? 'type.video' : 'type.audio'
+              const descKey = option.type === PromptType.TEXT ? 'type.textDesc' : option.type === PromptType.IMAGE ? 'type.imageDesc' : option.type === PromptType.VIDEO ? 'type.videoDesc' : 'type.audioDesc'
               return (
               <button
                 key={option.type}
@@ -456,14 +462,17 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
               <p>{t('chat.startChat')}{
                 taskType === PromptType.TEXT ? t('chat.promptSuffix') : 
                 taskType === PromptType.IMAGE ? t('chat.imageEffect') : 
-                t('chat.videoEffect')
+                taskType === PromptType.VIDEO ? t('chat.videoEffect') :
+                t('chat.audioEffect')
               }</p>
               <p className="text-sm mt-1">
                 {taskType === PromptType.TEXT 
                   ? t('chat.textAutoDesc')
                   : taskType === PromptType.IMAGE
                   ? t('chat.imageAutoDesc')
-                  : t('chat.videoAutoDesc')}
+                  : taskType === PromptType.VIDEO
+                  ? t('chat.videoAutoDesc')
+                  : t('chat.audioAutoDesc')}
               </p>
             </div>
             
@@ -517,6 +526,24 @@ export function ChatPanel({ config, onPromptExtracted }: ChatPanelProps) {
                 </span>
                 <span className="px-2 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
                   Atmosphere 氛围
+                </span>
+              </div>
+            )}
+
+            {/* 音频模式说明 */}
+            {taskType === PromptType.AUDIO && (
+              <div className="flex flex-wrap justify-center gap-2 mb-4 text-xs">
+                <span className="px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                  Tone 音色
+                </span>
+                <span className="px-2 py-1 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300">
+                  Tempo 速度
+                </span>
+                <span className="px-2 py-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300">
+                  Genre 流派
+                </span>
+                <span className="px-2 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
+                  Emotion 情感
                 </span>
               </div>
             )}

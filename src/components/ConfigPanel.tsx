@@ -122,22 +122,22 @@ export function ConfigPanel({ config, onConfigChange }: ConfigPanelProps) {
                 <button
                   onClick={() => setLocalConfig({
                     ...localConfig,
-                    baseUrl: 'https://api-inference.modelscope.cn/v1',
-                    modelName: 'Qwen/Qwen2.5-72B-Instruct'
+                    baseUrl: 'https://api.deepseek.com/v1',
+                    modelName: 'deepseek-chat'
                   })}
                   className="px-3 py-2 text-sm rounded-xl border border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
                 >
-                  ModelScope ({t('config.recommended')})
+                  DeepSeek ({t('config.recommended')})
                 </button>
                 <button
                   onClick={() => setLocalConfig({
                     ...localConfig,
-                    baseUrl: 'https://api.deepseek.com/v1',
-                    modelName: 'deepseek-chat'
+                    baseUrl: 'https://api-inference.modelscope.cn/v1',
+                    modelName: 'Qwen/Qwen2.5-72B-Instruct'
                   })}
                   className="px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-slate-300"
                 >
-                  DeepSeek
+                  ModelScope
                 </button>
                 <button
                   onClick={() => setLocalConfig({

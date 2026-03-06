@@ -3,7 +3,7 @@ import OpenAI from 'openai'
 
 /**
  * 向量嵌入 API
- * 使用 ModelScope 的 bge-large-zh 中文嵌入模型
+ * 使用 DeepSeek 的文本嵌入模型
  */
 export async function POST(request: NextRequest) {
   try {
@@ -16,23 +16,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const apiKey = process.env.MODELSCOPE_API_KEY
+    const apiKey = process.env.DEEPSEEK_API_KEY
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: '缺少 MODELSCOPE_API_KEY 环境变量' },
+        { success: false, error: '缺少 DEEPSEEK_API_KEY 环境变量' },
         { status: 500 }
       )
     }
 
-    // 使用 OpenAI SDK 调用 ModelScope 的嵌入 API
+    // 使用 OpenAI SDK 调用 DeepSeek 的嵌入 API
     const client = new OpenAI({
       apiKey,
-      baseURL: 'https://api-inference.modelscope.cn/v1'
+      baseURL: 'https://api.deepseek.com/v1'
     })
 
     // 调用嵌入模型
     const response = await client.embeddings.create({
-      model: 'AI-ModelScope/bge-large-zh-v1.5',
+      model: 'text-embedding-3-small',
       input: text,
       encoding_format: 'float'
     })

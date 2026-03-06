@@ -5,7 +5,13 @@
 export enum PromptType {
   TEXT = 'text',
   IMAGE = 'image',
-  VIDEO = 'video'
+  VIDEO = 'video',
+  AUDIO = 'audio'
+}
+
+export enum PromptMode {
+  GENERAL = 'general',          // 通用模式：简化、对话式、适合非专业用户
+  PROFESSIONAL = 'professional' // 专业模式：深度、参数化、包含高级技巧
 }
 
 export enum LogicMode {
@@ -41,6 +47,12 @@ export const TASK_TYPE_OPTIONS: TaskTypeOption[] = [
     name: '视频生成',
     description: 'Sora、Runway、Veo 等视频模型，支持风格参考检索',
     icon: '🎬'
+  },
+  {
+    type: PromptType.AUDIO,
+    name: '音频生成',
+    description: 'Suno、Udio、AudioCraft 等音频模型，支持多种音频类型生成',
+    icon: '🎵'
   }
 ]
 
@@ -52,6 +64,16 @@ export interface InteractionDetails {
   mood?: string
   duration?: string
   knowledgeContext?: string  // RAG 知识上下文
+  
+  // 音频特定字段
+  genre?: string             // 音乐流派
+  tone?: string              // 音色描述
+  tempo?: string             // 速度/节奏
+  instruments?: string       // 乐器组合
+  sampleRate?: string        // 采样率
+  bitRate?: string           // 比特率
+  referenceArtist?: string   // 参考艺术家
+  
   [key: string]: string | undefined
 }
 
@@ -95,13 +117,13 @@ export const AVAILABLE_MODELS: ModelOption[] = [
   {
     id: 'deepseek-ai/DeepSeek-V3',
     name: 'DeepSeek-V3',
-    provider: 'ModelScope',
+    provider: 'DeepSeek',
     description: 'DeepSeek 最新模型，推理能力强'
   },
   {
     id: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
     name: 'DeepSeek-R1-32B',
-    provider: 'ModelScope',
+    provider: 'DeepSeek',
     description: 'DeepSeek R1 蒸馏版，逻辑推理专长'
   },
 ]
@@ -117,11 +139,11 @@ export interface CompileResponse {
   }
 }
 
-// 默认配置 - ModelScope 魔搭社区
+// 默认配置 - DeepSeek API
 export const DEFAULT_CONFIG: ApiConfig = {
-  apiKey: 'ms-74196180-fca4-49f0-893c-53c75dd54e2b',
-  baseUrl: 'https://api-inference.modelscope.cn/v1',
-  modelName: 'Qwen/Qwen2.5-72B-Instruct'
+  apiKey: 'sk-aaceedc5897743158c4b099dc08b24c5',
+  baseUrl: 'https://api.deepseek.com/v1',
+  modelName: 'deepseek-chat'
 }
 
 // 生成唯一 ID

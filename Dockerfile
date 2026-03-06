@@ -1,4 +1,4 @@
-# Gestalt - AI Prompt Compiler
+# Prompt Optimizer - AI 提示词优化器
 FROM node:18-alpine
 
 WORKDIR /home/user/app

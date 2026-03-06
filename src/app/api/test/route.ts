@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 优先使用服务器端环境变量的 API Key
-    const apiKey = process.env.MODELSCOPE_API_KEY || config?.apiKey
+    const apiKey = process.env.DEEPSEEK_API_KEY || config?.apiKey
     
     // 验证必要参数
     if (!prompt || !messages || messages.length === 0) {
@@ -26,13 +26,13 @@ export async function POST(request: NextRequest) {
     
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: '缺少 API Key，请配置环境变量 MODELSCOPE_API_KEY 或在页面中输入' },
+        { success: false, error: '缺少 API Key，请配置环境变量 DEEPSEEK_API_KEY 或在页面中输入' },
         { status: 400 }
       )
     }
 
-    const baseUrl = process.env.MODELSCOPE_BASE_URL || config.baseUrl || 'https://api-inference.modelscope.cn/v1'
-    const model = modelId || 'Qwen/Qwen2.5-72B-Instruct'
+    const baseUrl = process.env.DEEPSEEK_BASE_URL || config.baseUrl || 'https://api.deepseek.com/v1'
+    const model = modelId || 'deepseek-chat'
 
     // 构建消息列表：System Prompt + 对话历史
     const apiMessages = [

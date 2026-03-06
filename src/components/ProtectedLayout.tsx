@@ -76,7 +76,7 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center">
               <h1 className="text-lg font-bold text-gray-800 dark:text-white">
-                Gestalt Prompt Compiler——提示词编译器
+                Gestalt——提示词优化器
               </h1>
             </div>
             

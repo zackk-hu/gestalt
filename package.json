@@ -1,7 +1,7 @@
 {
-  "name": "gestalt-prompt-compiler",
+  "name": "prompt-optimizer",
   "version": "1.0.0",
-  "description": "Gestalt - AI提示词编译器",
+  "description": "Prompt Optimizer - AI 提示词优化器",
   "scripts": {
     "dev": "next dev -p 7860 -H 0.0.0.0",
     "build": "next build",

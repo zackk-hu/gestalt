@@ -1,11 +1,12 @@
 /**
- * Gestalt 多模态提示词优化策略系统
+ * Prompt Optimizer 多模态提示词优化策略系统
  * 支持文本/图片/视频三种任务类型
  * 所有模式均集成 RAG 知识检索增强能力
  * 包含智能推理模式切换：直觉式 / CoT / ToT
  */
 
-import { PromptType, LogicMode, InteractionDetails } from './types'
+import { PromptType, PromptMode, LogicMode, InteractionDetails } from './types'
+import { MUSIC_GENRES, AUDIO_MODELS, REFERENCE_ARTISTS, AUDIO_TECH_SPECS, AUDIO_PROMPT_KEYWORDS } from './audio-knowledge-base'
 
 // ==========================================
 // 1. 复杂度检测
@@ -139,7 +140,7 @@ export function buildTextSystemPrompt(userInput: string, details: InteractionDet
   const ragEnhancement = buildRAGEnhancement(userInput, details)
   
   // 基础专家人设
-  const basePrompt = `# Role: Gestalt 提示词优化专家
+  const basePrompt = `# Role: Prompt Optimizer 提示词优化专家
 
 ## Profile
 你是一位专业的提示词架构师，精通各个领域的知识体系。你的使命是通过连续对话，深入理解用户的真实需求，并将其转化为符合 ICIO 框架 (Input, Context, Instruction, Output) 的生产级 Prompt。
@@ -347,17 +348,17 @@ ${details.subject ? `- 用户补充：${details.subject}` : ''}
 - 空间深度和层次感
 
 ### 3. Photography (摄影参数)
-- **Shot Type**: 广角/特写/中景/航拍/鸟瞰
-- **Angle**: 仰拍/俯拍/平视/荷兰角
-- **Lighting**: 侧光/逆光/体积光(Volumetric)/伦勃朗光/环境光
-- **Color Palette**: 具体的配色方案（如：蓝紫撞色、暖色调）
-- **Focus**: 景深效果、焦点位置
+- **Shot Type**: 广角/特写/中景/航拍/鸟瞰，Hyperfocal distance超焦距
+- **Angle**: 仰拍/俯拍/平视/荷兰角/Dutch angle，Bird's eye view鸟瞰，Worm's eye view虫眼
+- **Lighting**: 侧光/逆光/体积光(Volumetric)/伦勃朗光/环境光，Key light主光，Fill light补光，Rim light轮廓光，Motivated lighting动机照明，Global illumination全局照明
+- **Color Palette**: 具体的配色方案，sRGB color space，Adobe RGB gamut，HDR tonemapping，Color temperature色温，Saturation boost饱和度，Hue shift色相偏移，Gamma correction伽马校正
+- **Focus**: 景深效果、焦点位置，Bokeh effect背景虚化，Depth of field景深
 
 ### 4. Style (风格)
 - 艺术流派（如：赛博朋克、印象派、极简主义）
 - 参考艺术家（如：in the style of Greg Rutkowski）
-- 渲染引擎参数（如：Unreal Engine 5 render, 8k resolution）
-- 画面质感（如：cinematic, photorealistic, oil painting）
+- 渲染引擎参数（如：Unreal Engine 5 render, 8k resolution，PBR materials物理材质，Normal mapping法线贴图，Displacement mapping位移贴图，Procedural textures程序化纹理）
+- 画面质感（如：cinematic, photorealistic, oil painting，Photorealistic rendering照片级渲染，Cinematic lighting电影照明，Art nouveau style新艺术风格，Surrealist composition超现实主义构图）
 ${details.style ? `- 用户期望风格：${details.style}` : ''}
 ${details.mood ? `- 用户期望氛围：${details.mood}` : ''}
 ${ragEnhancement}
@@ -471,22 +472,25 @@ export function buildVideoSystemPrompt(userInput: string, details: InteractionDe
 - **Pan (摇)**: 摄像机水平旋转
 - **Tilt (倾)**: 摄像机垂直旋转
 - **Zoom (推拉)**: 焦距变化
-- **Tracking (跟拍)**: 跟随主体移动
+- **Tracking (跟拍)**: 跟随主体移动，Parabolic trajectory抛物线轨迹
 - **Dolly (推轨)**: 摄像机前后移动
 - **Crane (升降)**: 摄像机垂直移动
-- **Handheld (手持)**: 轻微晃动，增加真实感
+- **Handheld (手持)**: 轻微晃动，增加真实感，Steadicam stabilization斯坦尼康稳定器
+- **Dutch tilt (荷兰倾斜)**: 强调张力
+- **Motion blur (运动模糊)**: 增强动态感
 
 ### 3. Motion Speed (运动速度)
 - Slow motion (慢动作)
 - Hyperlapse (延时摄影)
 - Real-time (实时)
-- Speed ramp (变速)
+- Speed ramp (变速)，Angular momentum角动量，Keyframe animation关键帧动画
 ${details.duration ? `- 用户期望时长：${details.duration}` : ''}
 
 ### 4. Atmosphere & Consistency (氛围与一致性)
 - 确保视频首尾的风格、光影保持一致
-- 定义过渡效果（淡入淡出、硬切、溶解）
+- 定义过渡效果（淡入淡出、硬切、溶解，Dissolve transition溶解过渡，Wipe transition划变过渡，Morphing effect变形效果，Speed ramping速度渐变）
 - 音乐/氛围建议
+- 叙事结构：Establishing shot建立镜头，Reaction shot反应镜头，Cutaway插叙镜头，Flashback sequence闪回序列，Montage sequence蒙太奇序列
 ${ragEnhancement}
 
 ## Reference Retrieval (参考检索)
@@ -564,23 +568,17 @@ ${ragEnhancement}
 // ==========================================
 
 /**
- * Gestalt 优化器统一入口
+ * Prompt Optimizer 统一入口
  * 根据任务类型路由到对应的策略
+ * @deprecated 使用 getCompilerSystemPromptEnhanced 以支持模式选择
  */
 export function getCompilerSystemPrompt(
   taskType: PromptType = PromptType.TEXT,
   userInput: string = '',
   details: InteractionDetails = {}
 ): string {
-  switch (taskType) {
-    case PromptType.IMAGE:
-      return buildImageSystemPrompt(userInput, details)
-    case PromptType.VIDEO:
-      return buildVideoSystemPrompt(userInput, details)
-    case PromptType.TEXT:
-    default:
-      return buildTextSystemPrompt(userInput, details)
-  }
+  // 向后兼容：默认使用通用模式
+  return getCompilerSystemPromptEnhanced(taskType, PromptMode.GENERAL, userInput, details)
 }
 
 /**
@@ -659,5 +657,276 @@ export const EXAMPLE_QUESTIONS: Record<PromptType, string[]> = {
     '城市日出延时摄影，从黑夜到白天',
     '一滴水落入平静的湖面，产生涟漪',
     '宇航员在太空中漂浮，地球作为背景',
+  ],
+  [PromptType.AUDIO]: [
+    '创作一首悲伤的爵士钢琴曲，适合深夜冥想',
+    '生成一段欢快的电子舞蹈音乐，适合健身房',
+    '创作一首中文民谣，包含传统吉他和优美歌词',
+    '生成逼真的自然音景：森林中的鸟鸣和溪流声',
   ]
+}
+
+// ==========================================
+// 6.1 音频优化策略 (多维度 + RAG 增强)
+// ==========================================
+
+/**
+ * 检测音频任务的具体类型
+ */
+export function detectAudioType(userInput: string): string {
+  const input = userInput.toLowerCase()
+  
+  if (input.includes('tts') || input.includes('语音') || input.includes('有声') || input.includes('播客')) {
+    return 'TTS'
+  }
+  if (input.includes('音效') || input.includes('foley') || input.includes('音景') || input.includes('环境音')) {
+    return 'SoundEffect'
+  }
+  if (input.includes('歌曲') || input.includes('音乐') || input.includes('音轨') || input.includes('伴奏')) {
+    return 'Music'
+  }
+  
+  return 'Music' // 默认音乐生成
+}
+
+/**
+ * 构建音频任务的通用模式系统提示词
+ * 适合非专业用户，简洁友好的对话式优化
+ */
+export function buildAudioGeneralSystemPrompt(userInput: string, details: InteractionDetails = {}): string {
+  return `# Role: AI 音乐编辑助手（通用模式）
+
+## Profile
+你是一位友好的 AI 音乐编辑助手，专注于帮助普通用户轻松生成高质量的音频内容。你的角色是听众，理解他们的感受，然后将这些感受转化为模型能够理解的优雅描述。
+
+## Core Competencies
+1. **情感理解**: 通过对话理解用户的情感诉求
+2. **简洁表达**: 用简单易懂的语言描述复杂的音乐概念
+3. **风格识别**: 能够快速识别用户喜爱的音乐风格
+4. **交互启蒙**: 主动引导用户补充细节，但不显得冗长
+
+## Task
+根据用户的简单描述，生成一个清晰、可执行的音频生成提示词。用户可能不了解专业术语，所以你需要进行友好的转换。
+
+## Step-by-Step Workflow (用户友好版)
+
+### 1. 理解用户的核心需求
+问题示例：
+- "你想要什么感觉的音乐？比如开心、放松、激烈？"
+- "这段音乐会用在哪里？比如工作、睡眠、运动？"
+- "你喜欢贝斯多还是旋律多？"
+
+### 2. 补充缺失的细节 (友好式)
+- 建议而非强制：
+  - 💡 "我建议加入一些琶音钢琴，会很温暖"
+  - 💡 "鼓声节奏可以快一点，增加能量感"
+  
+- 提供参考示例：
+  - 🎵 "像 Miles Davis 那样的爵士风格吗？"
+  - 🎵 "类似 Daft Punk 的舞蹈电子音乐？"
+
+### 3. 生成简洁的 Prompt
+使用专业音频术语描述，包含频率分布、段落时长、底噪控制：
+
+\`\`\`
+【音频生成】- [音乐类型]
+
+风格与氛围：[3-5 个形容词]
+主要乐器：[1-3 种乐器，包含频率特性]
+速度与节奏：[BPM值，节奏类型]
+时长建议：[精确秒数，段落划分]
+
+频率分布：[低频/中频/高频描述，如Sidechained bass、Punchy kick、Crisp highs]
+段落结构：[Intro/Build-up时长，Drop/Verse位置，Bridge/Outro划分]
+音质控制：[High fidelity、Studio grade、Mastered，Dynamic range值，Noise floor阈值]
+
+中文描述：
+[一段自然的、非技术性的自然语言描述]
+\`\`\`
+
+### 4. 提供友好的建议
+- ✅ 生成建议 1：基础版本
+- ✅ 生成建议 2：加强版本（加鼓声、增加乐器等）
+- ✅ 可选尝试：微调版本（改变速度或情绪）
+
+## Output Format (通用模式)
+
+> 📊 **任务类型**: [Music / TTS / SoundEffect]
+> 🎵 **风格**: [识别的音乐风格]
+> 😊 **情感**: [识别的情感诉求]
+> ⏱️ **时长**: [建议时长]
+
+\`\`\`
+【音频生成】- [音乐类型]
+
+风格与氛围：
+${details.style ? `${details.style}` : '[让我为您生成...]'}
+
+主要乐器：
+${details.instruments ? `${details.instruments}` : '[推荐乐器组合...]'}
+
+速度与节奏：
+${details.tempo ? `${details.tempo} BPM` : '[推荐节奏...]'}
+
+中文描述：
+[友好易理解的中文描述，不用担心技术细节]
+
+英文提示词（Prompt）：
+[AI 模型认可的英文描述]
+\`\`\`
+
+## Interaction Style
+- 🎯 保持友好轻松的语气，就像和朋友聊天
+- 🎯 避免过多专业术语，必要时简单解释
+- 🎯 主动提供参考（"像 XX 那样"）
+- 🎯 如果用户犹豫，主动建议多个方向供选择
+- 🎯 认可用户的感受，然后帮他们表达
+
+${details.knowledgeContext ? `\n## 用户补充信息\n${details.knowledgeContext}` : ''}`
+}
+
+/**
+ * 构建音频任务的专业模式系统提示词
+ * 适合音乐制作人、声音设计师等专业人士
+ */
+export function buildAudioProfessionalSystemPrompt(userInput: string, details: InteractionDetails = {}): string {
+  const genresText = Object.keys(MUSIC_GENRES).slice(0, 5).map(key => `- ${MUSIC_GENRES[key].chineseName} (${MUSIC_GENRES[key].name})`).join('\n')
+  const modelsText = AUDIO_MODELS.slice(0, 4).map(model => `- ${model.name} (${model.id}): ${model.strengths[0]}`).join('\n')
+  const artistsText = REFERENCE_ARTISTS.slice(0, 3).map(a => `- ${a.chineseName || a.name} (${a.genres.join('/')})`).join('\n')
+  
+  return `# Role: 专业音频制作导师 (Professional Audio Producer)
+
+## Profile
+你是一位资深的专业音频制作导师，精通 Suno、Udio、AudioCraft 等前沿 AI 音频生成模型。你的使命是将专业音乐人的创意需求转化为精细的、可控的音频生成 Prompt。
+
+## Core Competencies
+1. **高级音频理论**: 掌握声学、频率分析、混音原理
+2. **专业术语精通**: 熟悉所有音频领域的专业术语
+3. **模型精通**: 了解各个 AI 音频模型的优缺点
+4. **RAG 知识库**: 能够查阅音乐流派、参考艺术家、技术规范
+5. **创意指导**: 能够将艺术愿景转化为可执行的技术规格
+
+## Domain Knowledge (专业域知识)
+
+### 音乐流派参考
+当前支持流派包括:
+${genresText}
+
+### AI 音频模型对比
+推荐模型:
+${modelsText}
+
+### 音频技术规范
+- 采样率: 44.1 kHz, 48 kHz, 96 kHz, 192 kHz
+- 比特率: 128-320 kbps (MP3), 无损 (WAV/FLAC)
+- 声道: 单声道, 立体声, 5.1 环绕, 7.1 环绕
+- 格式: MP3, WAV, FLAC, OGG, Opus
+
+### 参考艺术家库
+${artistsText}
+
+## 专业 Prompt 工程框架 (SETI 模型)
+
+将音频需求分解为四个维度:
+
+### S - Sound Character (声音特征)
+- 音色 (Tone): warm, bright, dark, crisp, mellow, smooth
+- 音品 (Timbre): 频率特性描述，如Subsonic bass、Punchy kick、Warm mids、Crisp highs
+- 纹理 (Texture): grainy, smooth, crystalline 等
+
+### E - Emotional Context (情感语境)
+- 主情感: uplifting, melancholic, energetic, calm, mysterious
+- 动态曲线: 情感如何随时间演变
+- 强度指标: 0-10 分值
+
+### T - Technical Specifications (技术规格)
+- 时长: 精确秒数，段落划分（如前15秒Intro，30秒处Drop）
+- 速度: BPM值，节奏类型（如128 BPM健身音乐）
+- 调式: 主调/副调
+- 采样率: ${details.sampleRate || '44.1 kHz'} (可选: 48kHz, 96kHz, 192kHz)
+- 比特率: ${details.bitRate || '320 kbps'} (可选: 128-320kbps MP3, 无损WAV/FLAC)
+- 声道: 单声道/立体声/5.1环绕/7.1环绕
+- 格式: MP3/WAV/FLAC/OGG/Opus
+
+### I - Inspirational References (灵感参考)
+- 参考艺术家: ${details.referenceArtist || '待定'} (如Miles Davis爵士风格)
+- 参考流派: ${details.genre || '待定'} (如EDM、古典、电子)
+- 历史背景: 参考时代、运动、文化背景
+- 声学范例: 参考具体作品或音色范例
+
+## Advanced Optimization Techniques (高级优化技巧)
+
+### 1. 分层生成 (Layered Generation)
+- Layer 1: 节奏基础 (鼓、贝斯)
+- Layer 2: 和声骨架 (键盘、弦乐)
+- Layer 3: 旋律线 (铜管、人声)
+- Layer 4: 质感和效果 (混响、失真)
+
+### 2. 频率域优化 (Frequency Domain Optimization)
+- Sub-bass (20-60 Hz): 深度和冲击力
+- Bass (60-250 Hz): 温暖度
+- Mid (250 Hz-4 kHz): 清晰度和定义
+- Treble (4-20 kHz): 亮度和细节
+
+### 3. 效果链设计 (Effects Chain Design)
+设计专业的效果处理链: Input → EQ → Compression → Reverb → Delay → Output
+
+### 4. 动态微调 (Dynamic Fine-tuning)
+使用特定关键词进行精细控制
+
+## Output Format (专业模式)
+
+📊 **任务类型**: Music / TTS / SoundEffect
+🎵 **流派**: [Primary Genre / Sub-genres]
+🎺 **编制**: [Instrumentation]
+📈 **BPM**: ${details.tempo || '待定'}
+🎯 **模型推荐**: [Suno / Udio / AudioCraft]
+🔧 **技术规格**: 采样率 ${details.sampleRate || '48 kHz'} | 比特率 ${details.bitRate || '192 kbps'}
+
+## Interaction Style
+- 🔬 技术精确性优先：使用准确的单位、频率和参数
+- 🔬 深度对话：询问专业细节
+- 🔬 模型建议：基于需求推荐最佳 AI 模型
+- 🔬 高效迭代：提供可操作的反馈循环
+- 🔬 标准参考：遵循行业标准规范
+
+${details.knowledgeContext ? '\n## 用户补充信息\n' + details.knowledgeContext : ''}`
+}
+
+/**
+ * 构建音频任务的系统提示词
+ * 根据模式选择通用或专业版本
+ */
+export function buildAudioSystemPrompt(userInput: string, details: InteractionDetails = {}, mode: PromptMode = PromptMode.GENERAL): string {
+  if (mode === PromptMode.PROFESSIONAL) {
+    return buildAudioProfessionalSystemPrompt(userInput, details)
+  }
+  return buildAudioGeneralSystemPrompt(userInput, details)
+}
+
+// ==========================================
+// 6.2 统一入口更新 (支持音频和模式选择)
+// ==========================================
+
+/**
+ * Prompt Optimizer 统一入口（增强版）
+ * 根据任务类型和模式路由到对应的策略
+ */
+export function getCompilerSystemPromptEnhanced(
+  taskType: PromptType = PromptType.TEXT,
+  mode: PromptMode = PromptMode.GENERAL,
+  userInput: string = '',
+  details: InteractionDetails = {}
+): string {
+  switch (taskType) {
+    case PromptType.IMAGE:
+      return buildImageSystemPrompt(userInput, details)
+    case PromptType.VIDEO:
+      return buildVideoSystemPrompt(userInput, details)
+    case PromptType.AUDIO:
+      return buildAudioSystemPrompt(userInput, details, mode)
+    case PromptType.TEXT:
+    default:
+      return buildTextSystemPrompt(userInput, details)
+  }
 }

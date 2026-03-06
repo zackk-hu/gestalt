@@ -7,7 +7,7 @@ export type Locale = 'zh' | 'en'
 const translations = {
   zh: {
     // ProtectedLayout / Auth
-    'app.title': 'Gestalt Prompt Compiler',
+    'app.title': 'Gestalt 提示词优化器',
     'app.loading': '加载中...',
     'app.welcome': '欢迎使用 Gestalt',
     'app.welcomeDesc': '请先登录或注册以开始使用提示词编译器',
@@ -37,16 +37,18 @@ const translations = {
     'auth.operationFailed': '操作失败，请稍后重试',
 
     // ChatPanel
-    'chat.title': '提示词编译车间',
+    'chat.title': '优化平台',
     'chat.clear': '清空',
     'chat.taskType': '任务类型：',
     'chat.startChat': '开始对话，描述你想要的',
     'chat.promptSuffix': '提示词',
     'chat.imageEffect': '图片效果',
     'chat.videoEffect': '视频效果',
+    'chat.audioEffect': '音频效果',
     'chat.textAutoDesc': '系统会自动判断任务复杂度，智能切换推理模式，支持 RAG 知识增强',
     'chat.imageAutoDesc': '系统会用"导演视角"结构化你的创意，支持风格参考检索',
     'chat.videoAutoDesc': '系统会生成专业的分镜脚本和运镜指令，支持影片风格参考',
+    'chat.audioAutoDesc': '系统支持通用/专业两种模式，提供完整的音频生成优化方案',
     'chat.intuition': '直觉式 · 简单任务',
     'chat.cot': '思维链 · 中等任务',
     'chat.tot': '思维树 · 复杂任务',
@@ -109,6 +111,8 @@ const translations = {
     'type.imageDesc': 'Midjourney、Flux、DALL-E 等图像模型，支持参考图检索',
     'type.video': '视频生成',
     'type.videoDesc': 'Sora、Runway、Veo 等视频模型，支持风格参考检索',
+    'type.audio': '音频生成',
+    'type.audioDesc': 'Suno、Udio、AudioCraft 等音频模型，支持多种音频类型生成',
 
     // Model descriptions
     'model.qwen72b': '通义千问大模型，综合能力强',
@@ -122,7 +126,7 @@ const translations = {
 
     // Landing Page
     'landing.headline': 'Gestalt',
-    'landing.subheadline': 'AI 提示词编译器',
+    'landing.subheadline': '提示词优化器',
     'landing.tagline': "从'对话'到'编译'，重构你的人机交互方式。",
     'landing.featuresTitle': '核心能力',
     'landing.featuresSubtitle': '重新定义提示词工程的每一个环节',
@@ -147,7 +151,7 @@ const translations = {
   },
   en: {
     // ProtectedLayout / Auth
-    'app.title': 'Gestalt Prompt Compiler',
+    'app.title': 'Gestalt',
     'app.loading': 'Loading...',
     'app.welcome': 'Welcome to Gestalt',
     'app.welcomeDesc': 'Please log in or register to start using the prompt compiler',
@@ -184,9 +188,11 @@ const translations = {
     'chat.promptSuffix': 'prompt',
     'chat.imageEffect': 'image effect',
     'chat.videoEffect': 'video effect',
+    'chat.audioEffect': 'audio effect',
     'chat.textAutoDesc': 'Auto-detects task complexity, switches reasoning modes, supports RAG knowledge enhancement',
     'chat.imageAutoDesc': 'Structures your creativity with a "director\'s eye" perspective, supports style reference retrieval',
     'chat.videoAutoDesc': 'Generates professional storyboards and camera instructions, supports film style references',
+    'chat.audioAutoDesc': 'Supports general/professional modes, provides complete audio generation optimization solutions',
     'chat.intuition': 'Intuition · Simple',
     'chat.cot': 'Chain-of-Thought · Medium',
     'chat.tot': 'Tree-of-Thoughts · Complex',
@@ -249,6 +255,8 @@ const translations = {
     'type.imageDesc': 'Midjourney, Flux, DALL-E and other image models with reference retrieval',
     'type.video': 'Video',
     'type.videoDesc': 'Sora, Runway, Veo and other video models with style references',
+    'type.audio': 'Audio',
+    'type.audioDesc': 'Suno, Udio, AudioCraft and other audio models supporting multiple audio types',
 
     // Model descriptions
     'model.qwen72b': 'Qwen large model, strong overall capability',
@@ -262,7 +270,7 @@ const translations = {
 
     // Landing Page
     'landing.headline': 'Gestalt',
-    'landing.subheadline': 'AI Prompt Compiler',
+    'landing.subheadline': 'Gestalt',
     'landing.tagline': "From 'conversation' to 'compilation', redefine your human-machine interaction.",
     'landing.featuresTitle': 'Core Capabilities',
     'landing.featuresSubtitle': 'Redefining every step of prompt engineering',
@@ -301,7 +309,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('zh')
 
   useEffect(() => {
-    const saved = localStorage.getItem('gestalt-locale') as Locale
+    const saved = localStorage.getItem('prompt-optimizer-locale') as Locale
     if (saved && (saved === 'zh' || saved === 'en')) {
       setLocaleState(saved)
     }
@@ -309,7 +317,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale)
-    localStorage.setItem('gestalt-locale', newLocale)
+    localStorage.setItem('prompt-optimizer-locale', newLocale)
   }, [])
 
   const t = useCallback((key: TranslationKey, params?: Record<string, string | number>): string => {

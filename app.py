@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Gestalt - AI Prompt Compiler
+Prompt Optimizer - AI 提示词优化器
 ModelScope Studio 入口文件
 
 此脚本用于启动 Next.js 生产服务器
@@ -17,7 +17,7 @@ def main():
     os.environ['HOSTNAME'] = '0.0.0.0'
     
     print("=" * 50)
-    print("Gestalt - AI Prompt Compiler")
+    print("Prompt Optimizer - AI 提示词优化器")
     print("服务地址: http://0.0.0.0:7860")
     print("=" * 50)
     

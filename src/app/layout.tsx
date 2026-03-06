@@ -4,7 +4,7 @@ import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { Providers } from '@/components/Providers'
 
 export const metadata: Metadata = {
-  title: 'Gestalt — AI Prompt Compiler',
+  title: 'Gestalt — AI 提示词优化器',
   description: 'Transform raw intent into professional-grade prompts with Meta-Prompting, CoT and intelligent reasoning mode switching',
   keywords: ['Gestalt', 'AI', 'Prompt', 'Prompt Compiler', 'Meta-Prompting', 'CoT', 'LLM'],
 }

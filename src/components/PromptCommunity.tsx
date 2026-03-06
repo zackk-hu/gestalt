@@ -283,7 +283,7 @@ export function PromptCommunity() {
 
   // 初始化数据
   useEffect(() => {
-    const saved = localStorage.getItem('gestalt-community-posts')
+    const saved = localStorage.getItem('prompt-optimizer-community-posts')
     if (saved) {
       try {
         setPosts(JSON.parse(saved))
@@ -296,7 +296,7 @@ export function PromptCommunity() {
   // 持久化
   useEffect(() => {
     if (posts.length > 0) {
-      localStorage.setItem('gestalt-community-posts', JSON.stringify(posts))
+      localStorage.setItem('prompt-optimizer-community-posts', JSON.stringify(posts))
     }
   }, [posts])
 
@@ -307,7 +307,7 @@ export function PromptCommunity() {
       id: generateId(),
       author: {
         id: currentUserId,
-        nickname: JSON.parse(localStorage.getItem('gestalt-user') || '{}').name || '匿名用户',
+        nickname: JSON.parse(localStorage.getItem('prompt-optimizer-user') || '{}').name || '匿名用户',
         role: 'member'
       },
       content: newPostContent.trim(),
@@ -341,9 +341,10 @@ export function PromptCommunity() {
       id: generateId(),
       author: {
         id: currentUserId,
-        nickname: JSON.parse(localStorage.getItem('gestalt-user') || '{}').name || '匿名用户',
+        nickname: JSON.parse(localStorage.getItem('prompt-optimizer-user') || '{}').name || '匿名用户',
         role: 'member'
       },
+
       content,
       time: new Date().toISOString(),
       likes: 0,
@@ -399,7 +400,7 @@ export function PromptCommunity() {
         {/* 发帖区 */}
         <div className="bg-white dark:bg-slate-800/80 rounded-2xl border border-gray-100 dark:border-slate-700/50 p-5 mb-6">
           <div className="flex gap-3">
-            <Avatar name={JSON.parse(localStorage.getItem('gestalt-user') || '{"name":"U"}').name || 'U'} />
+            <Avatar name={JSON.parse(localStorage.getItem('prompt-optimizer-user') || '{"name":"U"}').name || 'U'} />
             <div className="flex-1">
               <textarea
                 value={newPostContent}

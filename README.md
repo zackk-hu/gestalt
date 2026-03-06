@@ -1,4 +1,4 @@
-# Gestalt — AI 提示词编译器
+# Prompt Optimizer — AI 提示词优化器
 
 <p align="center">
   <strong>对话式 Prompt 编译 · 多模型实时测试 · 智能推理模式切换</strong>
@@ -8,9 +8,9 @@
 
 ## 📖 项目简介
 
-**Gestalt** 是一个 AI 提示词编译器，旨在帮助用户通过对话式交互，将模糊的需求转化为高质量、结构化的 Prompt，并提供多模型实时测试验证能力。
+**Prompt Optimizer** 是一个 AI 提示词优化器，旨在帮助用户通过对话式交互，将模糊的需求转化为高质量、结构化的 Prompt，并提供多模型实时测试验证能力。
 
-无论你是产品经理、内容创作者、开发者还是研究人员，Gestalt 都能帮你降低 Prompt 工程门槛，提升 AI 应用效率。
+无论你是产品经理、内容创作者、开发者还是研究人员，Prompt Optimizer 都能帮你降低 Prompt 工程门槛，提升 AI 应用效率。
 
 ### ✨ 核心特性
 
@@ -114,7 +114,7 @@ export interface ApiConfig {
 // 渐变背景 + 响应式布局 + 暗黑模式
 <div className="bg-gradient-to-br from-primary-500/20 via-accent-500/10 to-transparent">
   <h1 className="text-2xl sm:text-3xl font-bold dark:text-white">
-    Gestalt — AI提示词编译器
+    Prompt Optimizer — AI提示词优化器
   </h1>
 </div>
 ```
@@ -185,7 +185,7 @@ import { Sparkles, Zap, Brain, Palette, Shield } from 'lucide-react'
 
 ```bash
 # 克隆项目
-cd Gestalt
+cd prompt-optimizer
 
 # 安装依赖
 npm install
@@ -212,7 +212,7 @@ npm start
 ## 📁 项目结构
 
 ```
-Gestalt/
+prompt-optimizer/
 ├── src/
 │   ├── app/
 │   │   ├── api/

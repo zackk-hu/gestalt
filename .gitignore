@@ -33,7 +33,7 @@ yarn-error.log*
 .vercel
 
 # Nested project copy
-Gestalt/
+prompt-optimizer/
 
 # TypeScript
 *.tsbuildinfo

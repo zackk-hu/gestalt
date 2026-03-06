@@ -15,7 +15,7 @@ let initializationPromise: Promise<void> | null = null
  */
 async function getEmbedding(text: string, client: OpenAI): Promise<number[]> {
   const response = await client.embeddings.create({
-    model: 'AI-ModelScope/bge-large-zh-v1.5',
+    model: 'text-embedding-3-small',
     input: text,
     encoding_format: 'float'
   })
@@ -35,14 +35,14 @@ async function ensureInitialized(): Promise<void> {
   }
 
   initializationPromise = (async () => {
-    const apiKey = process.env.MODELSCOPE_API_KEY
+    const apiKey = process.env.DEEPSEEK_API_KEY
     if (!apiKey) {
-      throw new Error('缺少 MODELSCOPE_API_KEY 环境变量')
+      throw new Error('缺少 DEEPSEEK_API_KEY 环境变量')
     }
 
     const client = new OpenAI({
       apiKey,
-      baseURL: 'https://api-inference.modelscope.cn/v1'
+      baseURL: 'https://api.deepseek.com/v1'
     })
 
     const translator = getTerminologyTranslator()
@@ -96,10 +96,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const apiKey = process.env.MODELSCOPE_API_KEY
+    const apiKey = process.env.DEEPSEEK_API_KEY
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: '缺少 MODELSCOPE_API_KEY 环境变量' },
+        { success: false, error: '缺少 DEEPSEEK_API_KEY 环境变量' },
         { status: 500 }
       )
     }
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     // 获取查询向量
     const client = new OpenAI({
       apiKey,
-      baseURL: 'https://api-inference.modelscope.cn/v1'
+      baseURL: 'https://api.deepseek.com/v1'
     })
     
     const queryVector = await getEmbedding(query, client)

@@ -26,7 +26,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      const storedUser = localStorage.getItem('gestalt-user')
+      const storedUser = localStorage.getItem('prompt-optimizer-user')
       if (storedUser) {
         try {
           const user = JSON.parse(storedUser)
@@ -51,13 +51,13 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
 
     try {
       if (isLogin) {
-        const storedUsers = JSON.parse(localStorage.getItem('gestalt-users') || '[]')
+        const storedUsers = JSON.parse(localStorage.getItem('prompt-optimizer-users') || '[]')
         const user = storedUsers.find(
           (u: any) => u.email === formData.email && u.password === formData.password
         )
 
         if (user) {
-          localStorage.setItem('gestalt-user', JSON.stringify(user))
+          localStorage.setItem('prompt-optimizer-user', JSON.stringify(user))
           onAuthSuccess(user)
           setSuccess(t('auth.loginSuccess'))
           setTimeout(() => {
@@ -68,7 +68,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
           setError(t('auth.wrongCredentials'))
         }
       } else {
-        const storedUsers = JSON.parse(localStorage.getItem('gestalt-users') || '[]')
+        const storedUsers = JSON.parse(localStorage.getItem('prompt-optimizer-users') || '[]')
         const existingUser = storedUsers.find((u: any) => u.email === formData.email)
 
         if (existingUser) {
@@ -83,8 +83,8 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
           }
 
           storedUsers.push(newUser)
-          localStorage.setItem('gestalt-users', JSON.stringify(storedUsers))
-          localStorage.setItem('gestalt-user', JSON.stringify(newUser))
+          localStorage.setItem('prompt-optimizer-users', JSON.stringify(storedUsers))
+          localStorage.setItem('prompt-optimizer-user', JSON.stringify(newUser))
           onAuthSuccess(newUser)
           setSuccess(t('auth.registerSuccess'))
           setTimeout(() => {

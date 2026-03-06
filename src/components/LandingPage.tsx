@@ -34,19 +34,19 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
 
     try {
       if (isLogin) {
-        const storedUsers = JSON.parse(localStorage.getItem('gestalt-users') || '[]')
+        const storedUsers = JSON.parse(localStorage.getItem('prompt-optimizer-users') || '[]')
         const user = storedUsers.find(
           (u: any) => u.email === formData.email && u.password === formData.password
         )
         if (user) {
-          localStorage.setItem('gestalt-user', JSON.stringify(user))
+          localStorage.setItem('prompt-optimizer-user', JSON.stringify(user))
           onAuthSuccess(user)
           setSuccess(t('auth.loginSuccess'))
         } else {
           setError(t('auth.wrongCredentials'))
         }
       } else {
-        const storedUsers = JSON.parse(localStorage.getItem('gestalt-users') || '[]')
+        const storedUsers = JSON.parse(localStorage.getItem('prompt-optimizer-users') || '[]')
         const existingUser = storedUsers.find((u: any) => u.email === formData.email)
         if (existingUser) {
           setError(t('auth.emailExists'))
@@ -59,8 +59,8 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
             createdAt: new Date().toISOString()
           }
           storedUsers.push(newUser)
-          localStorage.setItem('gestalt-users', JSON.stringify(storedUsers))
-          localStorage.setItem('gestalt-user', JSON.stringify(newUser))
+          localStorage.setItem('prompt-optimizer-users', JSON.stringify(storedUsers))
+          localStorage.setItem('prompt-optimizer-user', JSON.stringify(newUser))
           onAuthSuccess(newUser)
           setSuccess(t('auth.registerSuccess'))
         }
@@ -255,7 +255,7 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/hero-gestalt.jpg"
-                alt="Gestalt Prompt Compiler"
+                alt="Gestalt 提示词优化器"
                 className="w-full max-w-lg rounded-2xl"
                 style={{ filter: 'drop-shadow(0 0 60px rgba(99, 102, 241, 0.2))' }}
               />
@@ -322,7 +322,7 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
       {/* Footer */}
       <footer className="py-8 px-6 border-t border-gray-200 dark:border-white/5">
         <div className="max-w-7xl mx-auto text-center text-gray-400 dark:text-slate-600 text-xs">
-          Gestalt Prompt Compiler &copy; {new Date().getFullYear()}
+          Gestalt 提示词优化器 &copy; {new Date().getFullYear()}
         </div>
       </footer>
     </div>

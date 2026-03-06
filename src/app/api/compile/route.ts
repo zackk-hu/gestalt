@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 优先使用服务器端环境变量的 API Key
-    const apiKey = process.env.MODELSCOPE_API_KEY || config?.apiKey
+    const apiKey = process.env.DEEPSEEK_API_KEY || config?.apiKey
     
     // 验证必要参数
     if (!messages || messages.length === 0) {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: '缺少 API Key，请配置环境变量 MODELSCOPE_API_KEY 或在页面中输入' },
+        { success: false, error: '缺少 API Key，请配置环境变量 DEEPSEEK_API_KEY 或在页面中输入' },
         { status: 400 }
       )
     }
@@ -44,14 +44,14 @@ export async function POST(request: NextRequest) {
     if (translator.isInitialized()) {
       try {
         // 由于这里无法直接计算向量，我们使用编译API的密钥来获取向量
-        const embeddingResponse = await fetch(`${process.env.MODELSCOPE_BASE_URL || 'https://api-inference.modelscope.cn/v1'}/embeddings`, {
+        const embeddingResponse = await fetch(`${process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1'}/embeddings`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
-            model: 'AI-ModelScope/bge-large-zh-v1.5',
+            model: 'text-embedding-3-small',
             input: userInput,
             encoding_format: 'float'
           })
@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const baseUrl = process.env.MODELSCOPE_BASE_URL || config.baseUrl || 'https://api-inference.modelscope.cn/v1'
-    const modelName = config.modelName || 'Qwen/Qwen2.5-72B-Instruct'
+    const baseUrl = process.env.DEEPSEEK_BASE_URL || config.baseUrl || 'https://api.deepseek.com/v1'
+    const modelName = config.modelName || 'deepseek-chat'
 
     
     // 构建消息列表（包含系统提示词和对话历史）

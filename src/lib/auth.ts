@@ -10,14 +10,14 @@ export interface User {
 // 检查用户是否已认证
 export function isAuthenticated(): boolean {
   if (typeof window === 'undefined') return false;
-  const user = localStorage.getItem('gestalt-user');
+  const user = localStorage.getItem('prompt-optimizer-user');
   return !!user;
 }
 
 // 获取当前用户信息
 export function getCurrentUser(): User | null {
   if (typeof window === 'undefined') return null;
-  const userStr = localStorage.getItem('gestalt-user');
+  const userStr = localStorage.getItem('prompt-optimizer-user');
   if (!userStr) return null;
   
   try {
@@ -31,7 +31,7 @@ export function getCurrentUser(): User | null {
 // 登出
 export function logout(): void {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('gestalt-user');
+    localStorage.removeItem('prompt-optimizer-user');
   }
 }
 

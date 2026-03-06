@@ -16,7 +16,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('dark')
 
   useEffect(() => {
-    const saved = localStorage.getItem('gestalt-theme') as Theme
+    const saved = localStorage.getItem('prompt-optimizer-theme') as Theme
     if (saved && (saved === 'light' || saved === 'dark')) {
       setThemeState(saved)
       applyTheme(saved)
@@ -42,7 +42,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme)
-    localStorage.setItem('gestalt-theme', newTheme)
+    localStorage.setItem('prompt-optimizer-theme', newTheme)
     applyTheme(newTheme)
   }, [])
 
