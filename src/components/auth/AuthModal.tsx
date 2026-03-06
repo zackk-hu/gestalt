@@ -121,7 +121,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
               <span className="text-white font-bold text-lg">G</span>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Gestalt</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Prompt Optimizer</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400">AI 提示词优化平台</p>
             </div>
           </div>

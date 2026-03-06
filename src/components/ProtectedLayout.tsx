@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react'
 import { isAuthenticated, getCurrentUser, logout } from '@/lib/auth'
 import { LandingPage } from './LandingPage'
-import { User, LogOut, Sun, Moon } from 'lucide-react'
+import { User, LogOut, Sun, Moon, FlaskConical, LayoutDashboard } from 'lucide-react'
 import { Button } from './Button'
 import { useI18n } from '@/lib/i18n'
 import { useTheme } from '@/lib/theme'
+import { usePathname, useRouter } from 'next/navigation'
 
 interface ProtectedLayoutProps {
   children: React.ReactNode
@@ -17,6 +18,10 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const [currentUser, setCurrentUser] = useState<any>(null)
   const { t, locale, setLocale } = useI18n()
   const { theme, toggleTheme } = useTheme()
+  const pathname = usePathname()
+  const router = useRouter()
+
+  const isProMode = pathname === '/pro-science'
 
   useEffect(() => {
     const checkAuth = () => {
@@ -76,8 +81,34 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center">
               <h1 className="text-lg font-bold text-gray-800 dark:text-white">
-                Gestalt——提示词优化器
+                Prompt Optimizer——提示词优化器
               </h1>
+
+              {/* Mode switcher */}
+              <div className="ml-4 flex items-center bg-gray-100 dark:bg-slate-700/60 rounded-xl p-0.5 gap-0.5">
+                <button
+                  onClick={() => router.push('/')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    !isProMode
+                      ? 'bg-white dark:bg-slate-600 text-gray-800 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <LayoutDashboard className="w-3 h-3" />
+                  常规模式
+                </button>
+                <button
+                  onClick={() => router.push('/pro-science')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    isProMode
+                      ? 'bg-white dark:bg-slate-600 text-gray-800 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <FlaskConical className="w-3 h-3" />
+                  科研模式
+                </button>
+              </div>
             </div>
             
             <div className="flex items-center gap-2">

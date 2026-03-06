@@ -7,9 +7,9 @@ export type Locale = 'zh' | 'en'
 const translations = {
   zh: {
     // ProtectedLayout / Auth
-    'app.title': 'Gestalt 提示词优化器',
+    'app.title': 'Prompt Optimizer 提示词优化器',
     'app.loading': '加载中...',
-    'app.welcome': '欢迎使用 Gestalt',
+    'app.welcome': '欢迎使用 Prompt Optimizer',
     'app.welcomeDesc': '请先登录或注册以开始使用提示词编译器',
     'app.getStarted': '开始使用',
     'app.logout': '登出',
@@ -37,7 +37,7 @@ const translations = {
     'auth.operationFailed': '操作失败，请稍后重试',
 
     // ChatPanel
-    'chat.title': '优化平台',
+    'chat.title': '提示词编译车间',
     'chat.clear': '清空',
     'chat.taskType': '任务类型：',
     'chat.startChat': '开始对话，描述你想要的',
@@ -125,7 +125,7 @@ const translations = {
     'theme.dark': '深色',
 
     // Landing Page
-    'landing.headline': 'Gestalt',
+    'landing.headline': 'Prompt Optimizer',
     'landing.subheadline': '提示词优化器',
     'landing.tagline': "从'对话'到'编译'，重构你的人机交互方式。",
     'landing.featuresTitle': '核心能力',
@@ -151,9 +151,9 @@ const translations = {
   },
   en: {
     // ProtectedLayout / Auth
-    'app.title': 'Gestalt',
+    'app.title': 'Prompt Optimizer',
     'app.loading': 'Loading...',
-    'app.welcome': 'Welcome to Gestalt',
+    'app.welcome': 'Welcome to Prompt Optimizer',
     'app.welcomeDesc': 'Please log in or register to start using the prompt compiler',
     'app.getStarted': 'Get Started',
     'app.logout': 'Logout',
@@ -269,8 +269,8 @@ const translations = {
     'theme.dark': 'Dark',
 
     // Landing Page
-    'landing.headline': 'Gestalt',
-    'landing.subheadline': 'Gestalt',
+    'landing.headline': 'Prompt Optimizer',
+    'landing.subheadline': 'Prompt Optimizer',
     'landing.tagline': "From 'conversation' to 'compilation', redefine your human-machine interaction.",
     'landing.featuresTitle': 'Core Capabilities',
     'landing.featuresSubtitle': 'Redefining every step of prompt engineering',

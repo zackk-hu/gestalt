@@ -1,20 +1,30 @@
 {
-  "name": "prompt-optimizer",
+  "name": "gestalt",
   "version": "1.0.0",
-  "description": "Prompt Optimizer - AI 提示词优化器",
+  "description": "Gestalt - AI 提示词优化器",
+  "main": "electron.js",
+  "homepage": "./",
   "scripts": {
     "dev": "next dev -p 7860 -H 0.0.0.0",
     "build": "next build",
     "start": "next start -p 7860 -H 0.0.0.0",
-    "lint": "next lint"
+    "lint": "next lint",
+    "electron": "electron .",
+    "electron-dev": "cross-env NODE_ENV=development electron .",
+    "electron-build": "npm run build && electron-builder",
+    "electron-build-win": "npm run build && electron-builder --win --x64",
+    "pack": "electron-builder --dir",
+    "dist": "npm run build && electron-builder --win --x64"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
     "next": "^14.2.20",
+    "openai": "^4.77.0",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^2.4.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "openai": "^4.77.0",
-    "lucide-react": "^0.468.0",
-    "clsx": "^2.1.1",
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
@@ -22,10 +32,47 @@
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^10.1.0",
+    "electron": "^40.8.0",
+    "electron-builder": "^26.8.1",
+    "electron-is-dev": "^3.0.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2"
+  },
+  "build": {
+    "appId": "com.gestalt.app",
+    "productName": "Gestalt",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron.js",
+      ".next/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "public/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Gestalt"
+    }
   }
 }

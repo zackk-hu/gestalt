@@ -96,7 +96,7 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
       {/* Top bar */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/60 dark:bg-transparent backdrop-blur-md dark:backdrop-blur-none border-b border-gray-100 dark:border-transparent">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <span className="text-sm font-bold text-gray-800 dark:text-white/80 tracking-wider uppercase">Gestalt</span>
+          <span className="text-sm font-bold text-gray-800 dark:text-white/80 tracking-wider uppercase">Prompt Optimizer</span>
           <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
@@ -255,7 +255,7 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/hero-gestalt.jpg"
-                alt="Gestalt 提示词优化器"
+                alt="Prompt Optimizer 提示词优化器"
                 className="w-full max-w-lg rounded-2xl"
                 style={{ filter: 'drop-shadow(0 0 60px rgba(99, 102, 241, 0.2))' }}
               />
@@ -322,7 +322,7 @@ export function LandingPage({ onAuthSuccess }: LandingPageProps) {
       {/* Footer */}
       <footer className="py-8 px-6 border-t border-gray-200 dark:border-white/5">
         <div className="max-w-7xl mx-auto text-center text-gray-400 dark:text-slate-600 text-xs">
-          Gestalt 提示词优化器 &copy; {new Date().getFullYear()}
+          Prompt Optimizer 提示词优化器 &copy; {new Date().getFullYear()}
         </div>
       </footer>
     </div>
